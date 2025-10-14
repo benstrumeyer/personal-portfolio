@@ -15,6 +15,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     message: ''
   });
 
+  const [errorMessage, setErrorMessage] = useState('');
   const { submitForm, isSubmitting } = useContactForm();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -23,32 +24,42 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
       ...prev,
       [name]: value
     }));
+    // Clear error message when user starts typing
+    if (errorMessage) {
+      setErrorMessage('');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Clear any previous error messages
+    setErrorMessage('');
+    
+    // Simple validation: require either name or email/phone
+    if (!formData.name.trim() && !formData.contact.trim()) {
+      setErrorMessage('Please provide at least your name or email address.');
+      return;
+    }
+    
     try {
       const result = await submitForm(formData);
       
       if (result.success) {
-        // Success - show success message or close modal
-        alert('Message sent successfully! I\'ll get back to you soon.');
+        // Success - close modal and reset form
         onClose();
-        // Reset form
         setFormData({
           name: '',
           company: '',
           contact: '',
           message: ''
         });
+        setErrorMessage('');
       } else {
-        // Error handling
-        alert(`Sorry, there was an error sending your message: ${result.message || 'Please try again.'}`);
+        setErrorMessage(result.message || 'Failed to send message. Please try again.');
       }
     } catch (error) {
-      console.error('Form submission error:', error);
-      alert('Sorry, there was an unexpected error. Please try again.');
+      setErrorMessage('Sorry, there was an unexpected error. Please try again.');
     }
   };
 
@@ -77,7 +88,6 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              required
             />
           </div>
 
@@ -100,7 +110,6 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
               name="contact"
               value={formData.contact}
               onChange={handleInputChange}
-              required
             />
           </div>
 
@@ -112,7 +121,6 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
               value={formData.message}
               onChange={handleInputChange}
               rows={4}
-              required
             />
           </div>
 
@@ -128,6 +136,12 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
               )}
             </span>
           </button>
+          
+          {errorMessage && (
+            <div className="error-message">
+              {errorMessage}
+            </div>
+          )}
         </form>
       </div>
     </div>

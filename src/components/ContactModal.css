@@ -244,6 +244,30 @@
   height: 1.25em;
 }
 
+/* Error Message */
+.error-message {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: hsla(0 100% 50% / 0.1);
+  border: 1px solid hsla(0 100% 50% / 0.3);
+  border-radius: 6px;
+  color: hsla(0 100% 60% / 0.9);
+  font-size: 1.4rem;
+  text-align: left;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .contact-modal {

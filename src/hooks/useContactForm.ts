@@ -46,8 +46,6 @@ export const useContactForm = () => {
       };
       
     } catch (error) {
-      console.error('Form submission error:', error);
-      
       return {
         success: false,
         message: error instanceof Error ? error.message : 'An unexpected error occurred'
