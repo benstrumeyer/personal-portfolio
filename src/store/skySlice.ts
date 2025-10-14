@@ -126,7 +126,7 @@ const initialState: SkyState = {
     enabled: {
       celestial: true,
       clouds: false,
-      rain: false,
+      rain: true,
       snow: true,
       fog: false,
       mountains: true,
@@ -191,6 +191,15 @@ const initialState: SkyState = {
           glowColor: '#ADD8E6',
         },
       },
+      rain: {
+        performanceMode: 'high',
+        customSettings: {
+          intensity: 0.7,
+          windStrength: 0.5,
+          dropSize: 1.0,
+          color: '#C8D8F0',
+        },
+      },
     },
     priorities: {
       celestial: 100,
@@ -209,7 +218,7 @@ const initialState: SkyState = {
     moduleQualityModes: {
       celestial: 'high',
       clouds: 'medium',
-      rain: 'low',
+      rain: 'high',
       snow: 'low',
       fog: 'medium',
       mountains: 'high',

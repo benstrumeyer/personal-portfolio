@@ -113,14 +113,20 @@ export const createMountainsModule = (): SkyModuleHook => {
       });
     }
     
-    // Adjust height factor for mobile responsiveness
+    // Adjust height factor for mobile and desktop responsiveness
     let adjustedHeightFactor = layer.heightFactor;
     if (isMobile) {
-      // Reduce heights for mobile - use a consistent reduction instead of random
-      adjustedHeightFactor = layer.heightFactor * 0.5; // 50% reduction for mobile
+      // Make mountains 40% bigger on mobile
+      adjustedHeightFactor = layer.heightFactor * 1.4;
       
       // Clamp to reasonable mobile limits
-      adjustedHeightFactor = Math.max(0.02, Math.min(0.12, adjustedHeightFactor));
+      adjustedHeightFactor = Math.max(0.02, Math.min(0.25, adjustedHeightFactor));
+    } else {
+      // Make mountains 15% bigger on desktop
+      adjustedHeightFactor = layer.heightFactor * 1.15;
+      
+      // Clamp to reasonable desktop limits
+      adjustedHeightFactor = Math.max(0.02, Math.min(0.25, adjustedHeightFactor));
     }
     
     // Draw mountain silhouette using Perlin noise

@@ -1,0 +1,150 @@
+/* Navigation Component Styles */
+:root {
+  --dark: 0;
+  --transition: 0.28s;
+  --font-size: 1.2rem;
+  --bg: hsla(0 0% 100% / 0.1);
+  --color: hsla(0 0% 100% / 0.8);
+}
+
+.navigation {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.8s ease-out;
+}
+
+.navigation.visible {
+  opacity: 1;
+}
+
+.nav-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.nav-button {
+  outline-color: hsla(0 0% 100% / 0.8);
+  --padding: calc(var(--font-size) * 0.75);
+  cursor: pointer;
+  letter-spacing: calc(var(--font-size) * 0.02);
+  font-family: sans-serif;
+  font-weight: bold;
+  background: var(--bg);
+  font-size: var(--font-size);
+  border-radius: calc(var(--font-size) * 0.5);
+  border: 4px solid hsla(0 0% 100% / calc(0.2 + (var(--hovered, 0) * 0.4)));
+  color: var(--color);
+  position: relative;
+  transition: border-color var(--transition);
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.8s ease-out forwards;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.nav-button > span {
+  background: var(--bg);
+  padding: calc(var(--font-size) * 0.9) calc(var(--font-size) * 1.36);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr calc((var(--font-size) * 1.75) * var(--hovered, 0));
+  align-items: center;
+  transition: grid-template-columns var(--transition);
+}
+
+.nav-button:after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--font-size) * -0.025);
+  background: hsla(0 0% 100% / 0.15);
+  filter: blur(calc(var(--font-size) * 0.4));
+  scale: var(--hovered, 0);
+  z-index: -1;
+  transition: scale var(--transition);
+}
+
+.nav-button:hover {
+  --hovered: 1;
+}
+
+.nav-button span span:nth-of-type(2) {
+  padding-left: var(--padding);
+  width: var(--font-size);
+}
+
+.nav-button svg {
+  display: inline-block;
+  transition: translate var(--transition) ease-in-out, opacity var(--transition) ease-in-out;
+}
+
+.nav-button:is(:focus-visible, :hover) {
+  --hovered: 1;
+}
+
+.nav-button span span:nth-of-type(2) svg {
+  stroke-width: 3;
+  translate: calc((1 - var(--hovered, 0)) * (var(--font-size) * 3)) 8%;
+  width: calc(var(--font-size) * 1);
+  opacity: var(--hovered, 0);
+}
+
+
+/* Fade in from bottom animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .navigation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    bottom: auto;
+    right: auto;
+    transform: translate(-50%, -50%);
+  }
+  
+  .nav-buttons {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .nav-button {
+    width: 100%;
+  }
+  
+  :root {
+    --font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-buttons {
+    gap: 14px;
+    max-width: 280px;
+  }
+  
+  :root {
+    --font-size: 1.3rem;
+  }
+}
+

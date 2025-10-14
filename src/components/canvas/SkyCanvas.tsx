@@ -8,6 +8,7 @@ import { createCelestialModule } from '@/modules/celestialModule';
 import { createSnowModule } from '@/modules/snowModule';
 import { createMountainsModule } from '@/modules/mountainsModule';
 import { createLightningModule } from '@/modules/lightningModule';
+import { createRainModule } from '@/modules/rainModule';
 import { useResponsiveConfig } from '@/hooks/useMediaQuery';
 import store from '@/store';
 
@@ -128,6 +129,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
     snow: () => createSnowModule(),
     mountains: () => createMountainsModule(),
     lightning: () => createLightningModule(),
+    rain: () => createRainModule(),
     // Additional modules will be added in future tasks
   }), []);
 
