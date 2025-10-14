@@ -149,14 +149,6 @@ const initialState: SkyState = {
           cloudOpacity: 0.7,
         },
       },
-      rain: {
-        performanceMode: 'low',
-        customSettings: {
-          rainIntensity: 0.5,
-          rainSpeed: 2.0,
-          rainOpacity: 0.8,
-        },
-      },
       snow: {
         performanceMode: 'low',
         customSettings: {

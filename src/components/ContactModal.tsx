@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useContactForm } from '../hooks/useContactForm';
-import { SVG_NAMESPACE } from '../constants/urls';
 import './ContactModal.css';
 
 interface ContactModalProps {

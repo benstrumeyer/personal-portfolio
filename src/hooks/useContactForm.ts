@@ -20,7 +20,7 @@ export const useContactForm = () => {
     
     try {
       // Get FormEasy URL from environment variable
-      const formEasyUrl = import.meta.env.VITE_FORMEASY_URL;
+      const formEasyUrl = import.meta.env['VITE_FORMEASY_URL'];
       
       if (!formEasyUrl) {
         throw new Error('FormEasy URL not configured. Please set VITE_FORMEASY_URL in your environment variables.');

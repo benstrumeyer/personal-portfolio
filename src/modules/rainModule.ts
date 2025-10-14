@@ -70,7 +70,7 @@ export const createRainModule = (): SkyModuleHook => {
   // Update rain drops
   const updateRainDrops = (p: p5) => {
     const currentTime = Date.now();
-    const timeDelta = currentTime - state.lastUpdateTime;
+    // const timeDelta = currentTime - state.lastUpdateTime;
     state.lastUpdateTime = currentTime;
 
     // Update existing rain drops
@@ -175,7 +175,7 @@ export const createRainModule = (): SkyModuleHook => {
       }
     },
     
-    update: (p: p5, deltaTime: number, globalState: any) => {
+    update: (p: p5, _deltaTime: number, _globalState: any) => {
       if (!state.isInitialized) return;
       
       // Update wind strength based on time for realistic variation
@@ -184,7 +184,7 @@ export const createRainModule = (): SkyModuleHook => {
       updateRainDrops(p);
     },
     
-    render: (p: p5, globalState: any) => {
+    render: (p: p5, _globalState: any) => {
       if (!state.isInitialized) return;
       
       renderRainDrops(p);
@@ -199,7 +199,7 @@ export const createRainModule = (): SkyModuleHook => {
     
     updateCanvasDimensions: (width: number, height: number) => {
       const oldWidth = state.canvasWidth;
-      const oldHeight = state.canvasHeight;
+      // const oldHeight = state.canvasHeight;
       
       state = {
         ...state,
