@@ -6,9 +6,7 @@ function App() {
     <div className="App">
       <main className="App-main">
         <SkyCanvas 
-          width={window.innerWidth}
-          height={window.innerHeight}
-          enabledModules={['celestial']}
+          enabledModules={['celestial', 'mountains', 'snow']}
           timeMultiplier={1.0}
           enablePerformanceMode={false}
         />

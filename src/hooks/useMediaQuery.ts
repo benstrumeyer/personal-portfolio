@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 /**
  * Custom hook to detect media query matches
@@ -61,7 +61,9 @@ export function useBreakpoint(): keyof typeof breakpoints {
 export function useResponsiveConfig() {
   const breakpoint = useBreakpoint();
   
-  const config = {
+  
+  // Memoize the config to prevent infinite loops
+  const config = useMemo(() => ({
     mobile: {
       sunVisibleStart: 0.0,
       sunVisibleEnd: 0.4, // Sun comes in sooner on mobile
@@ -78,7 +80,7 @@ export function useResponsiveConfig() {
       sunBaseSize: 40, // Half size desktop sun
       moonBaseSize: 45, // Half size desktop moon
     },
-  };
+  }), []);
 
   return config[breakpoint];
 }

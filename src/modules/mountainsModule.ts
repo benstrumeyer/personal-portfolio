@@ -40,24 +40,7 @@ export const createMountainsModule = (): SkyModuleHook => {
     scrollSpeed: 2, // Base scroll speed
   };
 
-  // Calculate mountain color based on time of day and layer depth
-  const getMountainColor = (dayProgress: number, layerId: number): string => {
-    // Canyon colors - earth tones and rock colors (darker foreground, lighter background)
-    const dawnColors = ['#5D4E37', '#6B5B47', '#7A6B57', '#8B7A67']; // Canyon rock tones: dark to light
-    const dayColors = ['#8B7355', '#9B8365', '#AB9375', '#BBA385']; // Warmer canyon tones: dark to light
-    const duskColors = ['#5D4E37', '#6B5B47', '#7A6B57', '#8B7A67']; // Canyon rock tones: dark to light
-
-    let palette: string[];
-    if (dayProgress < 0.25) {
-      palette = dawnColors;
-    } else if (dayProgress < 0.75) {
-      palette = dayColors;
-    } else {
-      palette = duskColors;
-    }
-
-    return (palette[layerId] as string) ?? palette[0];
-  };
+  // Static colors are defined in initializeMountains - no dynamic color function needed
 
   // Initialize mountain layers with vibrant colors - better balanced heights
   const initializeMountains = (): void => {
@@ -98,7 +81,7 @@ export const createMountainsModule = (): SkyModuleHook => {
   };
 
   // Update mountain positions for Perlin noise scrolling
-  const updateMountainPositions = (_deltaTime: number, dayProgress: number): void => {
+  const updateMountainPositions = (_deltaTime: number, _dayProgress: number): void => {
     state.layers.forEach((layer) => {
       // Keep the static colors defined in initializeMountains
       // layer.color remains unchanged from initialization
@@ -119,16 +102,25 @@ export const createMountainsModule = (): SkyModuleHook => {
     // Determine if we're on mobile (width < 768px)
     const isMobile = state.canvasWidth < 768;
     
+    // Debug logging (temporary)
+    if (Math.random() < 0.001) { // Log very rarely to avoid spam
+      console.log('Mountains Debug:', {
+        canvasWidth: state.canvasWidth,
+        isMobile,
+        layerId: layer.id,
+        originalHeight: layer.heightFactor,
+        adjustedHeight: isMobile ? layer.heightFactor * 0.5 : layer.heightFactor
+      });
+    }
+    
     // Adjust height factor for mobile responsiveness
     let adjustedHeightFactor = layer.heightFactor;
     if (isMobile) {
-      // Reduce heights for mobile and add random variation
-      const baseHeight = layer.heightFactor * 0.6; // 40% reduction for mobile
-      const randomVariation = p.random(0.8, 1.2); // Random range between 0.8 and 1.2
-      adjustedHeightFactor = baseHeight * randomVariation;
+      // Reduce heights for mobile - use a consistent reduction instead of random
+      adjustedHeightFactor = layer.heightFactor * 0.5; // 50% reduction for mobile
       
       // Clamp to reasonable mobile limits
-      adjustedHeightFactor = p.constrain(adjustedHeightFactor, 0.02, 0.15);
+      adjustedHeightFactor = Math.max(0.02, Math.min(0.12, adjustedHeightFactor));
     }
     
     // Draw mountain silhouette using Perlin noise
@@ -197,14 +189,36 @@ export const createMountainsModule = (): SkyModuleHook => {
     },
     
     updateCanvasDimensions: (width: number, height: number) => {
+      // Store previous dimensions to detect significant changes
+      const prevWidth = state.canvasWidth;
+      const prevHeight = state.canvasHeight;
+      
+      // Debug logging
+      console.log('Mountains updateCanvasDimensions:', {
+        prevWidth,
+        prevHeight,
+        newWidth: width,
+        newHeight: height,
+        prevIsMobile: prevWidth < 768,
+        newIsMobile: width < 768
+      });
+      
       state = {
         ...state,
         canvasWidth: width,
         canvasHeight: height,
       };
       
-      // Reinitialize mountains with new dimensions
-      initializeMountains();
+      // Only reinitialize if there's a significant size change (performance optimization)
+      const widthChange = Math.abs(width - prevWidth);
+      const heightChange = Math.abs(height - prevHeight);
+      const significantChange = widthChange > 50 || heightChange > 50;
+      
+      if (significantChange || prevWidth === 0 || prevHeight === 0) {
+        console.log('Reinitializing mountains due to significant change');
+        // Reinitialize mountains with new dimensions
+        initializeMountains();
+      }
     },
   };
 

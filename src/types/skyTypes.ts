@@ -102,8 +102,8 @@ export interface SkyModuleHook {
  * Props interface for SkyCanvas container component
  */
 export interface SkyCanvasProps {
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   timeMultiplier?: number;
   enablePerformanceMode?: boolean;
   enabledModules?: SkyModuleType[];

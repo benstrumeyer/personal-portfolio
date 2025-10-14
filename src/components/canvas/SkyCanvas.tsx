@@ -45,29 +45,62 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
   // Handle window resize for responsive behavior
   useEffect(() => {
     const handleResize = () => {
-      const newWidth = width || window.innerWidth;
-      const newHeight = height || window.innerHeight;
-      setDimensions({ width: newWidth, height: newHeight });
+      // Get the actual canvas container dimensions, not window dimensions
+      const containerElement = canvasRef.current?.parentElement;
+      const newWidth = width || (containerElement ? containerElement.clientWidth : window.innerWidth);
+      const newHeight = height || (containerElement ? containerElement.clientHeight : window.innerHeight);
       
-      if (p5Instance.current) {
-        p5Instance.current.resizeCanvas(newWidth, newHeight);
+      console.log('SkyCanvas resize:', {
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
+        containerWidth: containerElement?.clientWidth,
+        containerHeight: containerElement?.clientHeight,
+        newWidth,
+        newHeight,
+        currentDimensions: dimensions
+      });
+      
+      // Only update if dimensions actually changed
+      if (newWidth !== dimensions.width || newHeight !== dimensions.height) {
+        setDimensions({ width: newWidth, height: newHeight });
         
-        // Update module configurations with new dimensions
-        modulesRef.current.forEach(module => {
-          if (module.isInitialized) {
-            module.initialize(p5Instance.current!, {
-              canvasWidth: newWidth,
-              canvasHeight: newHeight,
-              performanceMode: enablePerformanceMode ? 'medium' : 'high'
-            });
-          }
-        });
+        if (p5Instance.current) {
+          p5Instance.current.resizeCanvas(newWidth, newHeight);
+          
+          // Update module configurations with new dimensions
+          modulesRef.current.forEach(module => {
+            if (module.isInitialized && 'updateCanvasDimensions' in module) {
+              (module as any).updateCanvasDimensions(newWidth, newHeight);
+            }
+          });
+        }
       }
     };
 
+    // Call handleResize immediately to set initial dimensions
+    handleResize();
+    
+    // Use ResizeObserver to detect container size changes
+    let resizeObserver: ResizeObserver | null = null;
+    const containerElement = canvasRef.current?.parentElement;
+    
+    if (containerElement && 'ResizeObserver' in window) {
+      resizeObserver = new ResizeObserver(() => {
+        handleResize();
+      });
+      resizeObserver.observe(containerElement);
+    }
+    
+    // Also listen for window resize as fallback
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [width, height, enablePerformanceMode]);
+    
+    return () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [width, height, enablePerformanceMode, dimensions.width, dimensions.height]);
 
   // Update CSS gradient background when sky colors change
   useEffect(() => {
@@ -98,7 +131,13 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
 
   // Initialize P5.js canvas and modules
   useEffect(() => {
-    if (canvasRef.current && !p5Instance.current) {
+    if (canvasRef.current) {
+      // Clean up existing P5 instance if it exists
+      if (p5Instance.current) {
+        modulesRef.current = [];
+        p5Instance.current.remove();
+        p5Instance.current = null;
+      }
       const sketch = (p: p5) => {
         let lastTime = 0;
 
@@ -120,6 +159,12 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
                   canvasHeight: dimensions.height,
                   performanceMode: enablePerformanceMode ? 'medium' : 'high'
                 });
+                
+                // Immediately update with current responsive config after initialization
+                if ('updateResponsiveConfig' in module) {
+                  (module as any).updateResponsiveConfig(responsiveConfig);
+                }
+                
                 return module;
               }
               return null;
@@ -177,24 +222,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
     };
   }, [dimensions.width, dimensions.height, enabledModules, enablePerformanceMode, moduleRegistry, dispatch]);
 
-  // Handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (p5Instance.current) {
-        p5Instance.current.resizeCanvas(dimensions.width, dimensions.height);
-        
-        // Update module configurations with new dimensions
-        modulesRef.current.forEach(module => {
-          if (module.isInitialized && 'updateCanvasDimensions' in module) {
-            (module as any).updateCanvasDimensions(dimensions.width, dimensions.height);
-          }
-        });
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [dimensions.width, dimensions.height]);
+  // Removed duplicate resize handler - using the comprehensive one above
 
   return (
     <div 
