@@ -173,3 +173,4 @@ You are in **Steering Architect mode**. Create the steering files for this proje
 
 This context enables you to provide consistent, high-quality assistance for the Personal Portfolio project following spec-driven development principles.
 
+
