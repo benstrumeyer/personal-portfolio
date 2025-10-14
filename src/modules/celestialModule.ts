@@ -298,6 +298,8 @@ export const createCelestialModule = (): SkyModuleHook => {
     render: (p: p5, _globalState: any) => {
       if (!state.isInitialized) return;
       
+      // Render celestial objects
+      
       // Render sun and moon with enhanced effects
       renderCelestialObject(p, state.sun, true);
       renderCelestialObject(p, state.moon, false);

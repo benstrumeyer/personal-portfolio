@@ -127,7 +127,7 @@ const initialState: SkyState = {
       celestial: true,
       clouds: false,
       rain: false,
-      snow: false,
+      snow: true,
       fog: false,
     },
     configurations: {

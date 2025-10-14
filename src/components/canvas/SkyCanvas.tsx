@@ -5,6 +5,7 @@ import { SkyCanvasProps, SkyModuleHook, SkyModuleType } from '@/types/skyTypes';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateTime, updateSkyColors, updateFrameRate } from '@/store/skySlice';
 import { createCelestialModule } from '@/modules/celestialModule';
+import { createSnowModule } from '@/modules/snowModule';
 import { useResponsiveConfig } from '@/hooks/useMediaQuery';
 import store from '@/store';
 
@@ -19,7 +20,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
   height,
   timeMultiplier: _timeMultiplier = 1.0,
   enablePerformanceMode = false,
-  enabledModules = ['celestial']
+  enabledModules: _enabledModules = ['celestial']
 }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const p5Instance = useRef<p5 | null>(null);
@@ -29,6 +30,13 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
 
   // Get current sky state
   const currentSkyState = useAppSelector(state => state.sky);
+  
+  // Get enabled modules from Redux store - memoized to prevent infinite re-renders
+  const enabledModules = useMemo(() => {
+    return Object.keys(currentSkyState.modules.enabled)
+      .filter(moduleType => currentSkyState.modules.enabled[moduleType as SkyModuleType])
+      .map(moduleType => moduleType as SkyModuleType);
+  }, [currentSkyState.modules.enabled]);
   
   // Get responsive configuration
   const responsiveConfig = useResponsiveConfig();
@@ -82,6 +90,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
   // Module registry for dynamic module loading - memoized to prevent infinite re-renders
   const moduleRegistry: Record<string, () => SkyModuleHook> = useMemo(() => ({
     celestial: () => createCelestialModule(),
+    snow: () => createSnowModule(),
     // Additional modules will be added in future tasks
   }), []);
 
@@ -96,6 +105,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
           
           // Set transparent background so CSS gradient shows through
           p.clear();
+          p.background(0, 0, 0, 0); // Transparent background
           
           // Initialize enabled modules
           modulesRef.current = enabledModules
@@ -115,7 +125,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
             .filter((module): module is SkyModuleHook => module !== null)
             .sort((a, b) => a.priority - b.priority); // Sort by priority for rendering order
 
-          console.log(`SkyCanvas initialized with ${modulesRef.current.length} modules`);
+          // SkyCanvas initialized
         };
 
         p.draw = () => {
@@ -131,8 +141,9 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
           // Get current sky state for rendering
           const currentSkyState = store.getState().sky;
 
-          // Clear canvas with transparent background (gradient will be handled by CSS)
+          // Clear canvas with transparent background
           p.clear();
+          p.background(0, 0, 0, 0); // Transparent background
 
           // Update all active modules
           modulesRef.current.forEach(module => {
