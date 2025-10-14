@@ -1,23 +1,13 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 import p5 from 'p5';
 import { Provider } from 'react-redux';
 import { SkyCanvasProps, SkyModuleHook, SkyModuleType } from '@/types/skyTypes';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateTime, updateSkyColors, updateFrameRate } from '@/store/skySlice';
+import { createCelestialModule } from '@/modules/celestialModule';
+import { Sun } from '@/components/Sun';
 import store from '@/store';
 
-/**
- * Helper function to convert hex color to RGB
- */
-function hexToRgb(hex: string | undefined): { r: number; g: number; b: number } {
-  if (!hex) return { r: 0, g: 0, b: 0 };
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1] || '00', 16),
-    g: parseInt(result[2] || '00', 16),
-    b: parseInt(result[3] || '00', 16)
-  } : { r: 0, g: 0, b: 0 };
-}
 
 /**
  * SkyCanvas Inner Component (uses Redux hooks)
@@ -35,33 +25,58 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
   const p5Instance = useRef<p5 | null>(null);
   const modulesRef = useRef<SkyModuleHook[]>([]);
   const dispatch = useAppDispatch();
+  const [sunPosition, setSunPosition] = useState({ x: 0, y: 0, isVisible: false });
 
-  // Sky state is accessed directly from store in the P5.js draw loop
+  // Get current sky state
+  const currentSkyState = useAppSelector(state => state.sky);
 
-  // Module registry for dynamic module loading
-  const moduleRegistry: Record<string, () => SkyModuleHook> = useMemo(() => ({
-    celestial: () => {
-      // Mock celestial module for now (will be implemented in task 2.1)
-      return {
-        type: 'celestial',
-        name: 'Celestial Objects',
-        isActive: true,
-        priority: 100,
-        isInitialized: false,
-        initialize: (_p: p5) => {
-          console.log('Celestial module initialized');
-        },
-        update: (_p: p5, _deltaTime: number, _globalState: any) => {
-          // Mock update logic
-        },
-        render: (_p: p5, _globalState: any) => {
-          // Mock render logic - placeholder for future celestial objects
-        },
-        setPerformanceMode: (mode: 'high' | 'medium' | 'low') => {
-          console.log(`Celestial module performance mode: ${mode}`);
-        }
-      };
+  // Calculate sun position using arc equation y = -0.02x² + 5
+  const calculateSunPosition = (dayProgress: number) => {
+    // Sun visible for first half (0.0 to 0.5) - comes up first
+    const visibleStart = 0.0;
+    const visibleEnd = 0.5;
+
+    if (dayProgress < visibleStart || dayProgress > visibleEnd) {
+      return { x: 0, y: height * 0.8, isVisible: false };
     }
+
+    const normalizedProgress = (dayProgress - visibleStart) / (visibleEnd - visibleStart);
+    
+    // Map progress to x position across the screen width
+    // Start from left edge and move to right edge
+    const x = normalizedProgress * width;
+    
+    // Calculate y position using arc equation: y = -0.02x² + 5
+    // Scale the equation to fit the canvas height
+    const scaledX = (x / width) * 20 - 10; // Scale x to range -10 to 10
+    const arcY = -0.02 * scaledX * scaledX + 5;
+    
+    // Map arc result to canvas coordinates
+    // The arc gives us values roughly 0-5, map to top portion of screen
+    const y = height * 0.2 + (5 - arcY) * (height * 0.3) / 5;
+    
+    return { x, y, isVisible: true };
+  };
+
+  // Update sun position when day progress changes
+  useEffect(() => {
+    const newPosition = calculateSunPosition(currentSkyState.global.dayProgress);
+    setSunPosition(newPosition);
+  }, [currentSkyState.global.dayProgress, width, height]);
+
+  // Update CSS gradient background when sky colors change
+  useEffect(() => {
+    const { top, middle, bottom } = currentSkyState.sky.colors.current;
+    const gradientStyle = `linear-gradient(to bottom, ${top} 0%, ${middle} 50%, ${bottom} 100%)`;
+    
+    if (canvasRef.current) {
+      canvasRef.current.style.background = gradientStyle;
+    }
+  }, [currentSkyState.sky.colors.current]);
+
+  // Module registry for dynamic module loading - memoized to prevent infinite re-renders
+  const moduleRegistry: Record<string, () => SkyModuleHook> = useMemo(() => ({
+    celestial: () => createCelestialModule(),
     // Additional modules will be added in future tasks
   }), []);
 
@@ -73,6 +88,9 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
 
         p.setup = () => {
           p.createCanvas(width, height);
+          
+          // Set transparent background so CSS gradient shows through
+          p.clear();
           
           // Initialize enabled modules
           modulesRef.current = enabledModules
@@ -108,35 +126,8 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
           // Get current sky state for rendering
           const currentSkyState = store.getState().sky;
 
-          // Create gradient background based on current sky colors
-          const { top, middle, bottom } = currentSkyState.sky.colors.current;
-          
-          // Create vertical gradient from top to bottom
-          for (let i = 0; i <= p.height; i++) {
-            const inter = i / p.height;
-            let r, g, b;
-            
-            if (inter < 0.5) {
-              // Top half: blend top and middle colors
-              const t = inter * 2;
-              const topColor = hexToRgb(top);
-              const middleColor = hexToRgb(middle);
-              r = Math.round(topColor.r + (middleColor.r - topColor.r) * t);
-              g = Math.round(topColor.g + (middleColor.g - topColor.g) * t);
-              b = Math.round(topColor.b + (middleColor.b - topColor.b) * t);
-            } else {
-              // Bottom half: blend middle and bottom colors
-              const t = (inter - 0.5) * 2;
-              const middleColor = hexToRgb(middle);
-              const bottomColor = hexToRgb(bottom);
-              r = Math.round(middleColor.r + (bottomColor.r - middleColor.r) * t);
-              g = Math.round(middleColor.g + (bottomColor.g - middleColor.g) * t);
-              b = Math.round(middleColor.b + (bottomColor.b - middleColor.b) * t);
-            }
-            
-            p.stroke(r, g, b);
-            p.line(0, i, p.width, i);
-          }
+          // Clear canvas with transparent background (gradient will be handled by CSS)
+          p.clear();
 
           // Update all active modules
           modulesRef.current.forEach(module => {
@@ -182,14 +173,31 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
 
   return (
     <div 
-      ref={canvasRef} 
       className="sky-canvas"
       style={{ 
         width: `${width}px`, 
         height: `${height}px`,
         position: 'relative'
       }}
-    />
+    >
+      <div 
+        ref={canvasRef} 
+        style={{ 
+          width: `${width}px`, 
+          height: `${height}px`,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          background: `linear-gradient(to bottom, ${currentSkyState.sky.colors.current.top} 0%, ${currentSkyState.sky.colors.current.middle} 50%, ${currentSkyState.sky.colors.current.bottom} 100%)`
+        }}
+      />
+      <Sun 
+        x={sunPosition.x}
+        y={sunPosition.y}
+        isVisible={sunPosition.isVisible}
+        size={70}
+      />
+    </div>
   );
 };
 

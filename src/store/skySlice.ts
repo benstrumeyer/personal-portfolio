@@ -23,7 +23,19 @@ interface SkyState {
   };
   sky: {
     colors: {
+      dawn: {
+        top: string;
+        middle: string;
+        bottom: string;
+        horizon: string;
+      };
       day: {
+        top: string;
+        middle: string;
+        bottom: string;
+        horizon: string;
+      };
+      dusk: {
         top: string;
         middle: string;
         bottom: string;
@@ -70,32 +82,44 @@ const initialState: SkyState = {
     currentTime: Date.now(),
     dayDuration: 30000, // 30 seconds for testing (will be 24 hours in production)
     timeMultiplier: 1.0,
-    dayProgress: 0.25, // Start at 25% through day (morning)
+    dayProgress: 0.0, // Start at 0% through day (dawn - sun rising)
     isPaused: false,
     lastUpdateTime: Date.now(),
   },
   sky: {
     colors: {
+      dawn: {
+        top: '#0B1426', // Deep aurora navy
+        middle: '#1A2332', // Dark aurora blue
+        bottom: '#2A3441', // Medium aurora blue
+        horizon: '#3A4450', // Lighter aurora blue
+      },
       day: {
-        top: '#4A90E2', // Bright sky blue
-        middle: '#87CEEB', // Sky blue
-        bottom: '#B0E0E6', // Powder blue
-        horizon: '#FFB347', // Warm peach
+        top: '#1A2332', // Aurora dark blue
+        middle: '#2A3441', // Aurora medium blue
+        bottom: '#3A4450', // Aurora light blue
+        horizon: '#4A545F', // Aurora horizon blue
+      },
+      dusk: {
+        top: '#0F1A2E', // Deep aurora dusk
+        middle: '#1F2A3E', // Aurora dusk blue
+        bottom: '#2F3A4E', // Aurora medium dusk
+        horizon: '#3F4A5E', // Aurora light dusk
       },
       night: {
-        top: '#0F0F23', // Deep space dark
-        middle: '#1A1A3E', // Dark navy
-        bottom: '#2D1B69', // Deep purple
-        horizon: '#FF6B35', // Warm orange (for stars/sunset)
+        top: '#0A0F1A', // Deepest aurora night
+        middle: '#1A1F2A', // Dark aurora night
+        bottom: '#2A2F3A', // Medium aurora night
+        horizon: '#3A3F4A', // Light aurora night
       },
       current: {
-        top: '#4A90E2',
-        middle: '#87CEEB',
-        bottom: '#B0E0E6',
-        horizon: '#FFB347',
+        top: '#1A2332',
+        middle: '#2A3441',
+        bottom: '#3A4450',
+        horizon: '#4A545F',
       },
     },
-    baseColor: '#4A90E2',
+    baseColor: '#1A2332',
     transitionSpeed: 0.02, // Smooth transitions
   },
   modules: {
@@ -209,33 +233,36 @@ const skySlice = createSlice({
       state.global.dayProgress = Math.max(0, Math.min(1, action.payload)); // Clamp between 0 and 1
     },
     
-    // Sky color management
+    // Sky color management - synced with sun/moon timing
     updateSkyColors: (state) => {
       const { dayProgress } = state.global;
       const { day, night, current } = state.sky.colors;
       
-      // Calculate transition factor based on day progress
-      // 0.0 = midnight, 0.25 = dawn, 0.5 = noon, 0.75 = dusk, 1.0 = midnight
-      let transitionFactor = 0;
+      // New timing synced with celestial objects:
+      // 0.0-0.5: Sun visible, moving left to right + Sky getting lighter then darker (morning to evening)
+      // 0.5-1.0: Moon visible, moving left to right + Sky getting darker (night)
       
-      if (dayProgress <= 0.25) {
-        // Night to dawn (0.0 to 0.25)
-        transitionFactor = dayProgress * 4;
-      } else if (dayProgress <= 0.5) {
-        // Dawn to noon (0.25 to 0.5)
-        transitionFactor = 1;
-      } else if (dayProgress <= 0.75) {
-        // Noon to dusk (0.5 to 0.75)
-        transitionFactor = 1;
+      // Create smooth transition based on celestial object position
+      let transitionFactor;
+      if (dayProgress <= 0.5) {
+        // Sun period: sky gets lighter as sun rises, then darker as sun sets
+        const sunProgress = dayProgress * 2; // 0 to 1
+        if (sunProgress <= 0.5) {
+          // First half of sun period: getting lighter (morning)
+          transitionFactor = sunProgress * 2; // 0 to 1 (night to day)
+        } else {
+          // Second half of sun period: getting darker (evening)
+          transitionFactor = 2 - (sunProgress * 2); // 1 to 0 (day to night)
+        }
       } else {
-        // Dusk to night (0.75 to 1.0)
-        transitionFactor = 1 - ((dayProgress - 0.75) * 4);
+        // Moon period: sky gets darker as moon moves right (night)
+        transitionFactor = 1 - ((dayProgress - 0.5) * 2); // 1 to 0 (day to night)
       }
       
-      // Smooth interpolation between night and day colors
+      // Use sine curve for smooth transition
       const smoothTransition = Math.sin(transitionFactor * Math.PI / 2);
       
-      // Interpolate colors
+      // Interpolate between night and day colors
       current.top = interpolateColor(night.top, day.top, smoothTransition);
       current.middle = interpolateColor(night.middle, day.middle, smoothTransition);
       current.bottom = interpolateColor(night.bottom, day.bottom, smoothTransition);
