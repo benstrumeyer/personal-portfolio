@@ -1,14 +1,30 @@
 import React, { useRef, useEffect, useMemo } from 'react';
 import p5 from 'p5';
-import { SkyCanvasProps, SkyModuleHook, SkyModuleType, SkyState } from '@/types/skyTypes';
+import { Provider } from 'react-redux';
+import { SkyCanvasProps, SkyModuleHook, SkyModuleType } from '@/types/skyTypes';
+import { useAppDispatch } from '@/store/hooks';
+import { updateTime, updateSkyColors, updateFrameRate } from '@/store/skySlice';
+import store from '@/store';
 
 /**
- * SkyCanvas Container Component
- * 
- * A React component that manages multiple atmospheric effect modules using P5.js canvas.
- * Each module is implemented as a React hook and integrated into the animation loop.
+ * Helper function to convert hex color to RGB
  */
-export const SkyCanvas: React.FC<SkyCanvasProps> = ({
+function hexToRgb(hex: string | undefined): { r: number; g: number; b: number } {
+  if (!hex) return { r: 0, g: 0, b: 0 };
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1] || '00', 16),
+    g: parseInt(result[2] || '00', 16),
+    b: parseInt(result[3] || '00', 16)
+  } : { r: 0, g: 0, b: 0 };
+}
+
+/**
+ * SkyCanvas Inner Component (uses Redux hooks)
+ * 
+ * This component uses Redux hooks and must be wrapped with Redux Provider.
+ */
+const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
   width,
   height,
   timeMultiplier: _timeMultiplier = 1.0,
@@ -18,26 +34,9 @@ export const SkyCanvas: React.FC<SkyCanvasProps> = ({
   const canvasRef = useRef<HTMLDivElement>(null);
   const p5Instance = useRef<p5 | null>(null);
   const modulesRef = useRef<SkyModuleHook[]>([]);
+  const dispatch = useAppDispatch();
 
-  // Mock sky state for now (will be replaced with Redux in task 1.3)
-  const mockSkyState: SkyState = useMemo(() => ({
-    currentTime: Date.now(),
-    dayProgress: 0.25, // 25% through day cycle
-    skyColors: {
-      top: '#87CEEB',
-      middle: '#B0E0E6',
-      bottom: '#F0F8FF',
-      horizon: '#FFB347'
-    },
-    performanceMode: enablePerformanceMode,
-    activeModules: {
-      celestial: enabledModules.includes('celestial'),
-      clouds: enabledModules.includes('clouds'),
-      rain: enabledModules.includes('rain'),
-      snow: enabledModules.includes('snow'),
-      fog: enabledModules.includes('fog')
-    }
-  }), [enablePerformanceMode, enabledModules]);
+  // Sky state is accessed directly from store in the P5.js draw loop
 
   // Module registry for dynamic module loading
   const moduleRegistry: Record<string, () => SkyModuleHook> = useMemo(() => ({
@@ -52,14 +51,11 @@ export const SkyCanvas: React.FC<SkyCanvasProps> = ({
         initialize: (_p: p5) => {
           console.log('Celestial module initialized');
         },
-        update: (_p: p5, _deltaTime: number, _globalState: SkyState) => {
+        update: (_p: p5, _deltaTime: number, _globalState: any) => {
           // Mock update logic
         },
-        render: (p: p5, _globalState: SkyState) => {
-          // Mock render logic - draw a simple circle for testing
-          p.fill(255, 255, 0, 200);
-          p.noStroke();
-          p.circle(p.width / 2, p.height / 2, 50);
+        render: (_p: p5, _globalState: any) => {
+          // Mock render logic - placeholder for future celestial objects
         },
         setPerformanceMode: (mode: 'high' | 'medium' | 'low') => {
           console.log(`Celestial module performance mode: ${mode}`);
@@ -104,21 +100,55 @@ export const SkyCanvas: React.FC<SkyCanvasProps> = ({
           const deltaTime = currentTime - lastTime;
           lastTime = currentTime;
 
-          // Clear canvas with sky background color
-          const bgColor = mockSkyState.skyColors.top;
-          p.background(bgColor);
+          // Update Redux state
+          dispatch(updateTime(currentTime));
+          dispatch(updateSkyColors());
+          dispatch(updateFrameRate(currentTime));
+
+          // Get current sky state for rendering
+          const currentSkyState = store.getState().sky;
+
+          // Create gradient background based on current sky colors
+          const { top, middle, bottom } = currentSkyState.sky.colors.current;
+          
+          // Create vertical gradient from top to bottom
+          for (let i = 0; i <= p.height; i++) {
+            const inter = i / p.height;
+            let r, g, b;
+            
+            if (inter < 0.5) {
+              // Top half: blend top and middle colors
+              const t = inter * 2;
+              const topColor = hexToRgb(top);
+              const middleColor = hexToRgb(middle);
+              r = Math.round(topColor.r + (middleColor.r - topColor.r) * t);
+              g = Math.round(topColor.g + (middleColor.g - topColor.g) * t);
+              b = Math.round(topColor.b + (middleColor.b - topColor.b) * t);
+            } else {
+              // Bottom half: blend middle and bottom colors
+              const t = (inter - 0.5) * 2;
+              const middleColor = hexToRgb(middle);
+              const bottomColor = hexToRgb(bottom);
+              r = Math.round(middleColor.r + (bottomColor.r - middleColor.r) * t);
+              g = Math.round(middleColor.g + (bottomColor.g - middleColor.g) * t);
+              b = Math.round(middleColor.b + (bottomColor.b - middleColor.b) * t);
+            }
+            
+            p.stroke(r, g, b);
+            p.line(0, i, p.width, i);
+          }
 
           // Update all active modules
           modulesRef.current.forEach(module => {
             if (module.isActive && module.isInitialized) {
-              module.update(p, deltaTime, mockSkyState);
+              module.update(p, deltaTime, currentSkyState);
             }
           });
 
           // Render all modules in priority order
           modulesRef.current.forEach(module => {
             if (module.isActive && module.isInitialized) {
-              module.render(p, mockSkyState);
+              module.render(p, currentSkyState);
             }
           });
         };
@@ -136,7 +166,7 @@ export const SkyCanvas: React.FC<SkyCanvasProps> = ({
         p5Instance.current = null;
       }
     };
-  }, [width, height, enabledModules, enablePerformanceMode, moduleRegistry, mockSkyState]);
+  }, [width, height, enabledModules, enablePerformanceMode, moduleRegistry, dispatch]);
 
   // Handle window resize
   useEffect(() => {
@@ -160,6 +190,19 @@ export const SkyCanvas: React.FC<SkyCanvasProps> = ({
         position: 'relative'
       }}
     />
+  );
+};
+
+/**
+ * SkyCanvas Container Component
+ * 
+ * Main component that provides Redux store context to the inner component.
+ */
+export const SkyCanvas: React.FC<SkyCanvasProps> = (props) => {
+  return (
+    <Provider store={store}>
+      <SkyCanvasInner {...props} />
+    </Provider>
   );
 };
 

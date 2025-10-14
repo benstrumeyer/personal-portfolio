@@ -17,6 +17,7 @@ export interface ModuleConfig {
 
 /**
  * Global sky state managed by Redux
+ * @deprecated Use Redux state from store instead
  */
 export interface SkyState {
   currentTime: number;
@@ -65,16 +66,16 @@ export interface SkyModuleHook {
    * Update module state and calculations
    * @param p5 - P5.js instance for canvas operations
    * @param deltaTime - Time elapsed since last update in milliseconds
-   * @param globalState - Current global sky state
+   * @param globalState - Current global sky state (any type for compatibility)
    */
-  update(p5: p5, deltaTime: number, globalState: SkyState): void;
+  update(p5: p5, deltaTime: number, globalState: any): void;
   
   /**
    * Render the module to the canvas
    * @param p5 - P5.js instance for canvas operations
-   * @param globalState - Current global sky state
+   * @param globalState - Current global sky state (any type for compatibility)
    */
-  render(p5: p5, globalState: SkyState): void;
+  render(p5: p5, globalState: any): void;
   
   /**
    * Set performance mode for the module
