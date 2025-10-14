@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useContactForm } from '../hooks/useContactForm';
+import { SVG_NAMESPACE } from '../constants/urls';
 import './ContactModal.css';
 
 interface ContactModalProps {
@@ -69,7 +70,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     <div className="contact-modal-overlay" onClick={onClose}>
       <div className="contact-modal" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-button" onClick={onClose}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+          <svg xmlns="{SVG_NAMESPACE}" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -129,7 +130,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
               <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
               {!isSubmitting && (
                 <span aria-hidden="true">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                  <svg xmlns="{SVG_NAMESPACE}" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                   </svg>
                 </span>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { EXTERNAL_URLS, SVG_NAMESPACE } from '../constants/urls';
 import './Navigation.css';
 
 interface NavigationProps {
@@ -35,22 +36,22 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
     },
     {
       label: 'Resume',
-      href: 'https://benstrumeyer.github.io/portfolio//Ben_Strumeyer_Resume.pdf',
+      href: EXTERNAL_URLS.RESUME,
       target: '_blank'
     },
     {
       label: 'Github',
-      href: 'https://github.com/benstrumeyer',
+      href: EXTERNAL_URLS.GITHUB,
       target: '_blank'
     },
     {
       label: 'LinkedIn',
-      href: 'https://www.linkedin.com/in/ben-strumeyer-8aa897113',
+      href: EXTERNAL_URLS.LINKEDIN,
       target: '_blank'
     },
     {
       label: 'Instagram',
-      href: 'https://www.instagram.com/ben_strumeyer',
+      href: EXTERNAL_URLS.INSTAGRAM,
       target: '_blank'
     }
   ];
@@ -78,7 +79,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
             <span>
               <span>{button.label}</span>
               <span aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                <svg xmlns={SVG_NAMESPACE} fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
                 </svg>
               </span>
