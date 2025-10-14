@@ -130,6 +130,7 @@ const initialState: SkyState = {
       snow: true,
       fog: false,
       mountains: true,
+      lightning: true,
     },
     configurations: {
       celestial: {
@@ -180,6 +181,16 @@ const initialState: SkyState = {
           colorIntensity: 1.0,
         },
       },
+      lightning: {
+        performanceMode: 'high',
+        customSettings: {
+          strikeInterval: 3000,
+          glowIntensity: 1.0,
+          flashIntensity: 1.0,
+          lightningColor: '#FFFFFF',
+          glowColor: '#ADD8E6',
+        },
+      },
     },
     priorities: {
       celestial: 100,
@@ -188,6 +199,7 @@ const initialState: SkyState = {
       snow: 40,
       fog: 20,
       mountains: 50,
+      lightning: 40, // Render below mountains
     },
   },
   performance: {
@@ -201,6 +213,7 @@ const initialState: SkyState = {
       snow: 'low',
       fog: 'medium',
       mountains: 'high',
+      lightning: 'high',
     },
     adaptiveQuality: true,
     lastFrameTime: Date.now(),

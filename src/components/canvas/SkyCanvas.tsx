@@ -7,6 +7,7 @@ import { updateTime, updateSkyColors, updateFrameRate } from '@/store/skySlice';
 import { createCelestialModule } from '@/modules/celestialModule';
 import { createSnowModule } from '@/modules/snowModule';
 import { createMountainsModule } from '@/modules/mountainsModule';
+import { createLightningModule } from '@/modules/lightningModule';
 import { useResponsiveConfig } from '@/hooks/useMediaQuery';
 import store from '@/store';
 
@@ -126,6 +127,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
     celestial: () => createCelestialModule(),
     snow: () => createSnowModule(),
     mountains: () => createMountainsModule(),
+    lightning: () => createLightningModule(),
     // Additional modules will be added in future tasks
   }), []);
 

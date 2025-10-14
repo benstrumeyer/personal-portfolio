@@ -6,7 +6,7 @@ function App() {
     <div className="App">
       <main className="App-main">
         <SkyCanvas 
-          enabledModules={['celestial', 'mountains', 'snow']}
+          enabledModules={['celestial', 'mountains', 'snow', 'lightning']}
           timeMultiplier={1.0}
           enablePerformanceMode={false}
         />
