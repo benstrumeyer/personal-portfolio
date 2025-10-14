@@ -139,6 +139,15 @@
     width: 100%;
   }
   
+  .nav-button > span {
+    grid-template-columns: 1fr calc(var(--font-size) * 1.75) !important;
+    transition: none !important;
+  }
+  
+  .nav-button span span:nth-of-type(2) {
+    display: none;
+  }
+  
   :root {
     --font-size: 1.5rem;
   }
