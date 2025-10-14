@@ -3,6 +3,8 @@ import './Navigation.css';
 
 interface NavigationProps {
   className?: string;
+  onContactClick?: (event: React.MouseEvent) => void;
+  isModalOpen?: boolean;
 }
 
 interface NavButton {
@@ -13,7 +15,7 @@ interface NavButton {
   target?: string;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
+const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick, isModalOpen = false }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   // Fade in animation on component mount
@@ -27,34 +29,34 @@ const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
 
   const buttons: NavButton[] = [
     {
-      label: 'Resume',
-      href: '/resume.pdf', // You can update this path
-      target: 'https://benstrumeyer.github.io/portfolio//Ben_Strumeyer_Resume.pdf'
-    },
-    {
-      label: 'Email',
-      href: 'mailto:ben.strumeyer@gmail.com', // Update with your email
+      label: 'Contact',
+      href: '#',
       target: '_self'
     },
     {
+      label: 'Resume',
+      href: 'https://benstrumeyer.github.io/portfolio//Ben_Strumeyer_Resume.pdf',
+      target: '_blank'
+    },
+    {
       label: 'Github',
-      href: 'https://github.com/benstrumeyer', // Update with your GitHub
+      href: 'https://github.com/benstrumeyer',
       target: '_blank'
     },
     {
       label: 'LinkedIn',
-      href: 'https://www.linkedin.com/in/ben-strumeyer-8aa897113', // Update with your LinkedIn
+      href: 'https://www.linkedin.com/in/ben-strumeyer-8aa897113',
       target: '_blank'
     },
     {
       label: 'Instagram',
-      href: 'https://www.instagram.com/ben_strumeyer', // Update with your Instagram
+      href: 'https://www.instagram.com/ben_strumeyer',
       target: '_blank'
     }
   ];
 
   return (
-    <nav className={`navigation ${className} ${isVisible ? 'visible' : ''}`}>
+    <nav className={`navigation ${className} ${isVisible ? 'visible' : ''} ${isModalOpen ? 'modal-open' : ''}`}>
       <div className="nav-buttons">
         {buttons.map((button, index) => (
           <a
@@ -66,6 +68,12 @@ const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
             style={{ 
               animationDelay: `${index * 0.2}s` // Stagger the fade-in animations with more delay
             }}
+            onClick={button.label === 'Contact' ? (e) => {
+              e.preventDefault();
+              if (onContactClick) {
+                onContactClick(e);
+              }
+            } : undefined}
           >
             <span>
               <span>{button.label}</span>
