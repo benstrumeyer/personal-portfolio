@@ -1,5 +1,5 @@
 export default {
-  preset: 'ts-jest/presets/js-with-ts',
+  preset: 'ts-jest/presets/default',
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   moduleNameMapping: {
@@ -25,6 +25,15 @@ export default {
       functions: 70,
       lines: 70,
       statements: 70,
+    },
+  },
+  // Add esModuleInterop for better compatibility
+  globals: {
+    'ts-jest': {
+      useESM: true,
+      tsconfig: {
+        esModuleInterop: true,
+      },
     },
   },
 };
