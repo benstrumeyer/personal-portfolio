@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useContactForm } from '../hooks/useContactForm';
 import './ContactModal.css';
 
 interface ContactModalProps {
@@ -14,6 +15,8 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     message: ''
   });
 
+  const { submitForm, isSubmitting } = useContactForm();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -22,12 +25,31 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
-    console.log('Form submitted:', formData);
-    // For now, just close the modal
-    onClose();
+    
+    try {
+      const result = await submitForm(formData);
+      
+      if (result.success) {
+        // Success - show success message or close modal
+        alert('Message sent successfully! I\'ll get back to you soon.');
+        onClose();
+        // Reset form
+        setFormData({
+          name: '',
+          company: '',
+          contact: '',
+          message: ''
+        });
+      } else {
+        // Error handling
+        alert(`Sorry, there was an error sending your message: ${result.message || 'Please try again.'}`);
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      alert('Sorry, there was an unexpected error. Please try again.');
+    }
   };
 
   if (!isOpen) return null;
@@ -94,14 +116,16 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
             />
           </div>
 
-          <button type="submit" className="submit-button">
+          <button type="submit" className="submit-button" disabled={isSubmitting}>
             <span>
-              <span>Send Message</span>
-              <span aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                </svg>
-              </span>
+              <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
+              {!isSubmitting && (
+                <span aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                  </svg>
+                </span>
+              )}
             </span>
           </button>
         </form>
