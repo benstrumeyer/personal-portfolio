@@ -59,7 +59,7 @@ export const createMountainsModule = (): SkyModuleHook => {
     return (palette[layerId] as string) ?? palette[0];
   };
 
-  // Initialize mountain layers with vibrant colors - darker in foreground, lighter in background
+  // Initialize mountain layers with vibrant colors - better balanced heights
   const initializeMountains = (): void => {
     state.layers = [
       {
@@ -73,23 +73,23 @@ export const createMountainsModule = (): SkyModuleHook => {
       {
         id: 1, // Second layer - medium dark, vibrant
         noiseScale: 0.005, // Medium frequency for more peaks/valleys
-        heightFactor: 0.10, // Small height (0-10%)
+        heightFactor: 0.08, // Small height (0-8%) - reduced from 10%
         color: '#6B4C3A', // Medium-dark, vibrant brown
         offset: 0,
         speed: 0.3, // Slower movement
       },
       {
-        id: 2, // Third layer - lighter, vibrant
-        noiseScale: 0.006, // Higher frequency for many more peaks and valleys
-        heightFactor: 0.18, // Medium height (0-18%)
+        id: 2, // Third layer - lighter, vibrant with moderate peaks/valleys
+        noiseScale: 0.008, // Moderate frequency for some peaks and valleys
+        heightFactor: 0.12, // Medium height (0-12%) - reduced from 18%
         color: '#8B6B47', // Lighter, vibrant brown
         offset: 0,
         speed: 0.15, // Slow movement
       },
       {
-        id: 3, // Back layer - lightest, vibrant background
-        noiseScale: 0.004, // Higher frequency for many more peaks and valleys
-        heightFactor: 0.25, // Tallest mountains (0-25%)
+        id: 3, // Back layer - lightest, vibrant with moderate peaks/valleys
+        noiseScale: 0.006, // Moderate frequency for some peaks and valleys
+        heightFactor: 0.16, // Tallest mountains (0-16%) - reduced from 25%
         color: '#A68B5B', // Lightest, vibrant sage brown
         offset: 0,
         speed: 0.05, // Very slow, barely noticeable movement
@@ -116,10 +116,25 @@ export const createMountainsModule = (): SkyModuleHook => {
     p.fill(layer.color);
     p.noStroke();
     
+    // Determine if we're on mobile (width < 768px)
+    const isMobile = state.canvasWidth < 768;
+    
+    // Adjust height factor for mobile responsiveness
+    let adjustedHeightFactor = layer.heightFactor;
+    if (isMobile) {
+      // Reduce heights for mobile and add random variation
+      const baseHeight = layer.heightFactor * 0.6; // 40% reduction for mobile
+      const randomVariation = p.random(0.8, 1.2); // Random range between 0.8 and 1.2
+      adjustedHeightFactor = baseHeight * randomVariation;
+      
+      // Clamp to reasonable mobile limits
+      adjustedHeightFactor = p.constrain(adjustedHeightFactor, 0.02, 0.15);
+    }
+    
     // Draw mountain silhouette using Perlin noise
     p.beginShape();
     for (let x = 0; x <= state.canvasWidth; x++) {
-      const y = p.noise(x * layer.noiseScale + layer.offset) * state.canvasHeight * layer.heightFactor;
+      const y = p.noise(x * layer.noiseScale + layer.offset) * state.canvasHeight * adjustedHeightFactor;
       p.vertex(x, state.canvasHeight - y);
     }
     p.vertex(state.canvasWidth, state.canvasHeight);
