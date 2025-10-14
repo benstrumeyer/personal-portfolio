@@ -80,46 +80,46 @@ interface SkyState {
 const initialState: SkyState = {
   global: {
     currentTime: Date.now(),
-    dayDuration: 30000, // 30 seconds for testing (will be 24 hours in production)
+    dayDuration: 360000, // 6 minutes for testing (half speed)
     timeMultiplier: 1.0,
-    dayProgress: 0.0, // Start at 0% through day (dawn - sun rising)
+    dayProgress: 0.083, // Start at ~1 o'clock position (1/12th through day)
     isPaused: false,
     lastUpdateTime: Date.now(),
   },
   sky: {
     colors: {
       dawn: {
-        top: '#0B1426', // Deep aurora navy
-        middle: '#1A2332', // Dark aurora blue
-        bottom: '#2A3441', // Medium aurora blue
-        horizon: '#3A4450', // Lighter aurora blue
+        top: '#1A2A4A', // Deep blue dawn
+        middle: '#2A3A5A', // Medium blue dawn
+        bottom: '#3A4A6A', // Light blue dawn
+        horizon: '#4A5A7A', // Horizon blue dawn
       },
       day: {
-        top: '#1A2332', // Aurora dark blue
-        middle: '#2A3441', // Aurora medium blue
-        bottom: '#3A4450', // Aurora light blue
-        horizon: '#4A545F', // Aurora horizon blue
+        top: '#2A4A6A', // Bright blue sky
+        middle: '#3A5A7A', // Medium blue sky
+        bottom: '#4A6A8A', // Light blue sky
+        horizon: '#5A7A9A', // Horizon blue sky
       },
       dusk: {
-        top: '#0F1A2E', // Deep aurora dusk
-        middle: '#1F2A3E', // Aurora dusk blue
-        bottom: '#2F3A4E', // Aurora medium dusk
-        horizon: '#3F4A5E', // Aurora light dusk
+        top: '#1A2A4A', // Deep blue dusk
+        middle: '#2A3A5A', // Medium blue dusk
+        bottom: '#3A4A6A', // Light blue dusk
+        horizon: '#4A5A7A', // Horizon blue dusk
       },
       night: {
-        top: '#0A0F1A', // Deepest aurora night
-        middle: '#1A1F2A', // Dark aurora night
-        bottom: '#2A2F3A', // Medium aurora night
-        horizon: '#3A3F4A', // Light aurora night
+        top: '#0A1A2A', // Deep night blue
+        middle: '#1A2A3A', // Dark night blue
+        bottom: '#2A3A4A', // Medium night blue
+        horizon: '#3A4A5A', // Light night blue
       },
       current: {
-        top: '#1A2332',
-        middle: '#2A3441',
-        bottom: '#3A4450',
-        horizon: '#4A545F',
+        top: '#2A4A6A',
+        middle: '#3A5A7A',
+        bottom: '#4A6A8A',
+        horizon: '#5A7A9A',
       },
     },
-    baseColor: '#1A2332',
+    baseColor: '#2A4A6A',
     transitionSpeed: 0.02, // Smooth transitions
   },
   modules: {
@@ -210,7 +210,14 @@ const skySlice = createSlice({
       if (!state.global.isPaused) {
         // Update day progress based on time multiplier
         const timeIncrement = (deltaTime * state.global.timeMultiplier) / state.global.dayDuration;
-        state.global.dayProgress = (state.global.dayProgress + timeIncrement) % 1;
+        let newProgress = state.global.dayProgress + timeIncrement;
+        
+        // Ensure dayProgress stays within 0-1 bounds
+        while (newProgress < 0) newProgress += 1;
+        while (newProgress >= 1) newProgress -= 1;
+        
+        state.global.dayProgress = newProgress;
+        
         state.global.currentTime = currentTime;
       }
       

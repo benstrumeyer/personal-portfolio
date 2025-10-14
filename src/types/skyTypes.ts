@@ -82,6 +82,19 @@ export interface SkyModuleHook {
    * @param mode - Performance quality level
    */
   setPerformanceMode(mode: 'high' | 'medium' | 'low'): void;
+  
+  /**
+   * Update responsive configuration for the module (optional)
+   * @param config - Responsive configuration object
+   */
+  updateResponsiveConfig?(config: any): void;
+  
+  /**
+   * Update canvas dimensions for the module (optional)
+   * @param width - New canvas width
+   * @param height - New canvas height
+   */
+  updateCanvasDimensions?(width: number, height: number): void;
   // No destroy method needed - useEffect handles cleanup automatically
 }
 

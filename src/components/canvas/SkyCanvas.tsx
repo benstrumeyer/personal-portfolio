@@ -5,7 +5,7 @@ import { SkyCanvasProps, SkyModuleHook, SkyModuleType } from '@/types/skyTypes';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateTime, updateSkyColors, updateFrameRate } from '@/store/skySlice';
 import { createCelestialModule } from '@/modules/celestialModule';
-import { Sun } from '@/components/Sun';
+import { useResponsiveConfig } from '@/hooks/useMediaQuery';
 import store from '@/store';
 
 
@@ -25,44 +25,40 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
   const p5Instance = useRef<p5 | null>(null);
   const modulesRef = useRef<SkyModuleHook[]>([]);
   const dispatch = useAppDispatch();
-  const [sunPosition, setSunPosition] = useState({ x: 0, y: 0, isVisible: false });
+  const [dimensions, setDimensions] = useState({ width: width || window.innerWidth, height: height || window.innerHeight });
 
   // Get current sky state
   const currentSkyState = useAppSelector(state => state.sky);
+  
+  // Get responsive configuration
+  const responsiveConfig = useResponsiveConfig();
 
-  // Calculate sun position using arc equation y = -0.02x² + 5
-  const calculateSunPosition = (dayProgress: number) => {
-    // Sun visible for first half (0.0 to 0.5) - comes up first
-    const visibleStart = 0.0;
-    const visibleEnd = 0.5;
-
-    if (dayProgress < visibleStart || dayProgress > visibleEnd) {
-      return { x: 0, y: height * 0.8, isVisible: false };
-    }
-
-    const normalizedProgress = (dayProgress - visibleStart) / (visibleEnd - visibleStart);
-    
-    // Map progress to x position across the screen width
-    // Start from left edge and move to right edge
-    const x = normalizedProgress * width;
-    
-    // Calculate y position using arc equation: y = -0.02x² + 5
-    // Scale the equation to fit the canvas height
-    const scaledX = (x / width) * 20 - 10; // Scale x to range -10 to 10
-    const arcY = -0.02 * scaledX * scaledX + 5;
-    
-    // Map arc result to canvas coordinates
-    // The arc gives us values roughly 0-5, map to top portion of screen
-    const y = height * 0.2 + (5 - arcY) * (height * 0.3) / 5;
-    
-    return { x, y, isVisible: true };
-  };
-
-  // Update sun position when day progress changes
+  // Handle window resize for responsive behavior
   useEffect(() => {
-    const newPosition = calculateSunPosition(currentSkyState.global.dayProgress);
-    setSunPosition(newPosition);
-  }, [currentSkyState.global.dayProgress, width, height]);
+    const handleResize = () => {
+      const newWidth = width || window.innerWidth;
+      const newHeight = height || window.innerHeight;
+      setDimensions({ width: newWidth, height: newHeight });
+      
+      if (p5Instance.current) {
+        p5Instance.current.resizeCanvas(newWidth, newHeight);
+        
+        // Update module configurations with new dimensions
+        modulesRef.current.forEach(module => {
+          if (module.isInitialized) {
+            module.initialize(p5Instance.current!, {
+              canvasWidth: newWidth,
+              canvasHeight: newHeight,
+              performanceMode: enablePerformanceMode ? 'medium' : 'high'
+            });
+          }
+        });
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [width, height, enablePerformanceMode]);
 
   // Update CSS gradient background when sky colors change
   useEffect(() => {
@@ -73,6 +69,15 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
       canvasRef.current.style.background = gradientStyle;
     }
   }, [currentSkyState.sky.colors.current]);
+
+  // Update celestial module with responsive configuration
+  useEffect(() => {
+    modulesRef.current.forEach(module => {
+      if (module.isInitialized && 'updateResponsiveConfig' in module) {
+        (module as any).updateResponsiveConfig(responsiveConfig);
+      }
+    });
+  }, [responsiveConfig]);
 
   // Module registry for dynamic module loading - memoized to prevent infinite re-renders
   const moduleRegistry: Record<string, () => SkyModuleHook> = useMemo(() => ({
@@ -87,7 +92,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
         let lastTime = 0;
 
         p.setup = () => {
-          p.createCanvas(width, height);
+          p.createCanvas(dimensions.width, dimensions.height);
           
           // Set transparent background so CSS gradient shows through
           p.clear();
@@ -99,8 +104,8 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
               if (moduleFactory) {
                 const module = moduleFactory();
                 module.initialize(p, {
-                  canvasWidth: width,
-                  canvasHeight: height,
+                  canvasWidth: dimensions.width,
+                  canvasHeight: dimensions.height,
                   performanceMode: enablePerformanceMode ? 'medium' : 'high'
                 });
                 return module;
@@ -157,45 +162,46 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
         p5Instance.current = null;
       }
     };
-  }, [width, height, enabledModules, enablePerformanceMode, moduleRegistry, dispatch]);
+  }, [dimensions.width, dimensions.height, enabledModules, enablePerformanceMode, moduleRegistry, dispatch]);
 
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       if (p5Instance.current) {
-        p5Instance.current.resizeCanvas(width, height);
+        p5Instance.current.resizeCanvas(dimensions.width, dimensions.height);
+        
+        // Update module configurations with new dimensions
+        modulesRef.current.forEach(module => {
+          if (module.isInitialized && 'updateCanvasDimensions' in module) {
+            (module as any).updateCanvasDimensions(dimensions.width, dimensions.height);
+          }
+        });
       }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [width, height]);
+  }, [dimensions.width, dimensions.height]);
 
   return (
     <div 
       className="sky-canvas"
       style={{ 
-        width: `${width}px`, 
-        height: `${height}px`,
+        width: width ? `${width}px` : '100vw', 
+        height: height ? `${height}px` : '100vh',
         position: 'relative'
       }}
     >
       <div 
         ref={canvasRef} 
         style={{ 
-          width: `${width}px`, 
-          height: `${height}px`,
+          width: '100%', 
+          height: '100%',
           position: 'absolute',
           top: 0,
           left: 0,
           background: `linear-gradient(to bottom, ${currentSkyState.sky.colors.current.top} 0%, ${currentSkyState.sky.colors.current.middle} 50%, ${currentSkyState.sky.colors.current.bottom} 100%)`
         }}
-      />
-      <Sun 
-        x={sunPosition.x}
-        y={sunPosition.y}
-        isVisible={sunPosition.isVisible}
-        size={70}
       />
     </div>
   );
