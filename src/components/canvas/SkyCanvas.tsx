@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateTime, updateSkyColors, updateFrameRate } from '@/store/skySlice';
 import { createCelestialModule } from '@/modules/celestialModule';
 import { createSnowModule } from '@/modules/snowModule';
+import { createMountainsModule } from '@/modules/mountainsModule';
 import { useResponsiveConfig } from '@/hooks/useMediaQuery';
 import store from '@/store';
 
@@ -91,6 +92,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
   const moduleRegistry: Record<string, () => SkyModuleHook> = useMemo(() => ({
     celestial: () => createCelestialModule(),
     snow: () => createSnowModule(),
+    mountains: () => createMountainsModule(),
     // Additional modules will be added in future tasks
   }), []);
 

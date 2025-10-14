@@ -112,8 +112,8 @@ export const createCelestialModule = (): SkyModuleHook => {
     }
     
     // Map progress to x position across the screen width
-    // Start from left edge and move to right edge
-    const x = normalizedProgress * state.canvasWidth;
+    // Start from right edge and move to left edge (reversed direction)
+    const x = (1 - normalizedProgress) * state.canvasWidth;
     
     // Calculate y position using arc equation: y = -0.02x² + 5
     // Scale the equation to fit the canvas height
@@ -151,8 +151,8 @@ export const createCelestialModule = (): SkyModuleHook => {
     }
     
     // Map progress to x position across the screen width
-    // Start from left edge and move to right edge
-    const x = normalizedProgress * state.canvasWidth;
+    // Start from right edge and move to left edge (reversed direction)
+    const x = (1 - normalizedProgress) * state.canvasWidth;
     
     // Calculate y position using arc equation: y = -0.02x² + 5
     // Scale the equation to fit the canvas height

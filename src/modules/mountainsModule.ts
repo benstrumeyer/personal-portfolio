@@ -1,0 +1,197 @@
+import p5 from 'p5';
+import { SkyModuleHook, ModuleConfig } from '@/types/skyTypes';
+
+/**
+ * Mountains Module Factory
+ * 
+ * Creates a mountains module that renders layered mountain silhouettes
+ * using Perlin noise for natural-looking mountain ranges.
+ */
+
+interface MountainLayer {
+  id: number;
+  noiseScale: number; // How wavy the mountain is
+  heightFactor: number; // How tall it is relative to canvas
+  color: string;
+  offset: number; // Used for scrolling
+  speed: number; // Scroll speed multiplier
+}
+
+interface MountainsModuleState {
+  layers: MountainLayer[];
+  isInitialized: boolean;
+  performanceMode: 'high' | 'medium' | 'low';
+  canvasWidth: number;
+  canvasHeight: number;
+  scrollSpeed: number;
+}
+
+/**
+ * Create a mountains module instance
+ */
+export const createMountainsModule = (): SkyModuleHook => {
+  // Module state
+  let state: MountainsModuleState = {
+    layers: [],
+    isInitialized: false,
+    performanceMode: 'high',
+    canvasWidth: 800,
+    canvasHeight: 600,
+    scrollSpeed: 2, // Base scroll speed
+  };
+
+  // Calculate mountain color based on time of day and layer depth
+  const getMountainColor = (dayProgress: number, layerId: number): string => {
+    // Canyon colors - earth tones and rock colors (darker foreground, lighter background)
+    const dawnColors = ['#5D4E37', '#6B5B47', '#7A6B57', '#8B7A67']; // Canyon rock tones: dark to light
+    const dayColors = ['#8B7355', '#9B8365', '#AB9375', '#BBA385']; // Warmer canyon tones: dark to light
+    const duskColors = ['#5D4E37', '#6B5B47', '#7A6B57', '#8B7A67']; // Canyon rock tones: dark to light
+
+    let palette: string[];
+    if (dayProgress < 0.25) {
+      palette = dawnColors;
+    } else if (dayProgress < 0.75) {
+      palette = dayColors;
+    } else {
+      palette = duskColors;
+    }
+
+    return (palette[layerId] as string) ?? palette[0];
+  };
+
+  // Initialize mountain layers with vibrant colors - darker in foreground, lighter in background
+  const initializeMountains = (): void => {
+    state.layers = [
+      {
+        id: 0, // Front layer - dark, vibrant foreground
+        noiseScale: 0.008, // Higher frequency for more peaks and valleys
+        heightFactor: 0.04, // Small height (0-4%)
+        color: '#4A2C2A', // Dark, vibrant brown - darkest in foreground
+        offset: 0,
+        speed: 0.4, // Slower, more gentle movement
+      },
+      {
+        id: 1, // Second layer - medium dark, vibrant
+        noiseScale: 0.005, // Medium frequency for more peaks/valleys
+        heightFactor: 0.10, // Small height (0-10%)
+        color: '#6B4C3A', // Medium-dark, vibrant brown
+        offset: 0,
+        speed: 0.3, // Slower movement
+      },
+      {
+        id: 2, // Third layer - lighter, vibrant
+        noiseScale: 0.006, // Higher frequency for many more peaks and valleys
+        heightFactor: 0.18, // Medium height (0-18%)
+        color: '#8B6B47', // Lighter, vibrant brown
+        offset: 0,
+        speed: 0.15, // Slow movement
+      },
+      {
+        id: 3, // Back layer - lightest, vibrant background
+        noiseScale: 0.004, // Higher frequency for many more peaks and valleys
+        heightFactor: 0.25, // Tallest mountains (0-25%)
+        color: '#A68B5B', // Lightest, vibrant sage brown
+        offset: 0,
+        speed: 0.05, // Very slow, barely noticeable movement
+      },
+    ];
+  };
+
+  // Update mountain positions for Perlin noise scrolling
+  const updateMountainPositions = (_deltaTime: number, dayProgress: number): void => {
+    state.layers.forEach((layer) => {
+      // Keep the static colors defined in initializeMountains
+      // layer.color remains unchanged from initialization
+      
+      // Update offset for Perlin noise scrolling
+      layer.offset += state.scrollSpeed * layer.speed * layer.noiseScale;
+    });
+  };
+
+  // Render a single mountain layer using Perlin noise
+  const renderMountainLayer = (p: p5, layer: MountainLayer): void => {
+    p.push();
+    
+    // Set mountain color
+    p.fill(layer.color);
+    p.noStroke();
+    
+    // Draw mountain silhouette using Perlin noise
+    p.beginShape();
+    for (let x = 0; x <= state.canvasWidth; x++) {
+      const y = p.noise(x * layer.noiseScale + layer.offset) * state.canvasHeight * layer.heightFactor;
+      p.vertex(x, state.canvasHeight - y);
+    }
+    p.vertex(state.canvasWidth, state.canvasHeight);
+    p.vertex(0, state.canvasHeight);
+    p.endShape(p.CLOSE);
+    
+    p.pop();
+  };
+
+  // Module interface implementation
+  const module: SkyModuleHook = {
+    type: 'mountains',
+    name: 'Mountains Module',
+    isActive: true,
+    priority: 50, // Render before celestial objects (behind them)
+    get isInitialized() {
+      return state.isInitialized;
+    },
+    
+    initialize: (_p: p5, config: ModuleConfig) => {
+      state = {
+        ...state,
+        isInitialized: true,
+        canvasWidth: config.canvasWidth,
+        canvasHeight: config.canvasHeight,
+        performanceMode: config.performanceMode,
+      };
+      
+      // Initialize mountain layers
+      initializeMountains();
+    },
+    
+    update: (_p: p5, deltaTime: number, globalState: any) => {
+      if (!state.isInitialized) return;
+      
+      // Get day progress for color changes
+      const dayProgress = globalState.global?.dayProgress || 0;
+      
+      // Update mountain positions and colors
+      updateMountainPositions(deltaTime, dayProgress);
+    },
+    
+    render: (p: p5, _globalState: any) => {
+      if (!state.isInitialized) return;
+      
+      // Render mountain layers from back to front (background layers first, then foreground on top)
+      state.layers.slice().reverse().forEach(layer => {
+        renderMountainLayer(p, layer);
+      });
+    },
+    
+    setPerformanceMode: (mode: 'high' | 'medium' | 'low') => {
+      state = {
+        ...state,
+        performanceMode: mode,
+      };
+      
+      // Adjust scroll speed based on performance mode
+      state.scrollSpeed = mode === 'high' ? 2.0 : mode === 'medium' ? 1.5 : 1.0;
+    },
+    
+    updateCanvasDimensions: (width: number, height: number) => {
+      state = {
+        ...state,
+        canvasWidth: width,
+        canvasHeight: height,
+      };
+      
+      // Reinitialize mountains with new dimensions
+      initializeMountains();
+    },
+  };
+
+  return module;
+};

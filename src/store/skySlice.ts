@@ -129,6 +129,7 @@ const initialState: SkyState = {
       rain: false,
       snow: true,
       fog: false,
+      mountains: true,
     },
     configurations: {
       celestial: {
@@ -171,6 +172,14 @@ const initialState: SkyState = {
           fogOpacity: 0.6,
         },
       },
+      mountains: {
+        performanceMode: 'high',
+        customSettings: {
+          movementSpeed: 0.5,
+          layerCount: 4,
+          colorIntensity: 1.0,
+        },
+      },
     },
     priorities: {
       celestial: 100,
@@ -178,6 +187,7 @@ const initialState: SkyState = {
       rain: 60,
       snow: 40,
       fog: 20,
+      mountains: 50,
     },
   },
   performance: {
@@ -190,6 +200,7 @@ const initialState: SkyState = {
       rain: 'low',
       snow: 'low',
       fog: 'medium',
+      mountains: 'high',
     },
     adaptiveQuality: true,
     lastFrameTime: Date.now(),
