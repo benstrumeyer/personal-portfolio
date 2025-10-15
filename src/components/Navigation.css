@@ -217,8 +217,8 @@
   }
   
   .nav-button {
-    width: 80%;
-    max-width: 250px;
+    min-width: 120px;
+    max-width: 180px;
   }
   
   .nav-button > span {
@@ -247,18 +247,18 @@
   /* Keep hover effects on desktop */
   
   :root {
-    --font-size: 1.5rem;
+    --font-size: 1rem;
   }
 }
 
 @media (max-width: 480px) {
   .nav-buttons {
     gap: 14px;
-    max-width: 220px;
+    max-width: 400px;
   }
   
   :root {
-    --font-size: 1.3rem;
+    --font-size: 0.9rem;
   }
 }
 
