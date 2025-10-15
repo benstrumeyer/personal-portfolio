@@ -185,15 +185,15 @@ export const createLeavesModule = (): SkyModuleHook => {
     update: (p: p5, deltaTime: number, globalState: any) => {
       if (!state.isInitialized) return;
       
-      // TEMPORARY: Show leaves all the time for testing
-      // const dayProgress = globalState.global?.dayProgress || 0;
-      // const isSunVisible = dayProgress <= 0.5; // Sun is visible from 0.0-0.5
+      // Only show leaves when sun is visible (day time)
+      const dayProgress = globalState.global?.dayProgress || 0;
+      const isSunVisible = dayProgress <= 0.5; // Sun is visible from 0.0-0.5
       
-      // if (!isSunVisible) {
-      //   // Clear leaves during night time (when moon is visible)
-      //   state.leaves = [];
-      //   return;
-      // }
+      if (!isSunVisible) {
+        // Clear leaves during night time (when moon is visible)
+        state.leaves = [];
+        return;
+      }
       
       // Get current time for gradual buildup
       const currentTime = globalState.global?.currentTime || Date.now();

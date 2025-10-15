@@ -72,7 +72,7 @@ export const createLightningModule = (): SkyModuleHook => {
   const createLightningStrike = (): LightningStrike => {
     const x = Math.random() * state.canvasWidth;
     const intensity = 0.8 + Math.random() * 0.4; // 0.8 to 1.2 intensity
-    const width = 2 + Math.random() * 3; // 2-5 pixel width
+    const width = 0.5 + Math.random() * 1.0; // 0.5-1.5 pixel width (much thinner)
     const glowRadius = 15 + Math.random() * 25; // 15-40 pixel glow
     
     return {
@@ -154,7 +154,7 @@ export const createLightningModule = (): SkyModuleHook => {
     const alpha = lightningIntensity * 255;
     
     p.stroke(255, 255, 255, alpha); // White lightning
-    p.strokeWeight(strike.width);
+    p.strokeWeight(strike.width * 0.3); // Much thinner lightning
     p.noFill();
     
     // Draw jagged lightning path
