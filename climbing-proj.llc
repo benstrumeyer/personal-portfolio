@@ -1,0 +1,11 @@
+{
+  version: 1,
+  mediaFileName: 'climbing.mp4',
+  cutSegments: [
+    {
+      start: 38.034166,
+      end: 101.143265,
+      name: '',
+    },
+  ],
+}

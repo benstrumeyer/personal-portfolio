@@ -1,0 +1,21 @@
+{
+  "name": "Ben's Portfolio",
+  "short_name": "Ben's Portfolio",
+  "description": "An immersive, interactive portfolio featuring dynamic weather effects, animated landscapes, and creative web development projects.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2A4A6A",
+  "theme_color": "#2A4A6A",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%234A90E2'/><path d='M25 30 Q35 25 45 30 Q55 35 65 30 Q75 35 85 30 Q80 40 75 45 Q70 50 65 55 Q55 60 45 55 Q35 50 30 45 Q25 40 25 30' fill='%23228B22'/><path d='M15 60 Q25 55 35 60 Q45 65 55 60 Q65 65 75 60 Q80 70 75 80 Q65 85 55 80 Q45 75 35 80 Q25 75 20 70 Q15 65 15 60' fill='%23228B22'/><path d='M70 15 Q80 20 85 30 Q80 25 70 20 Q70 15' fill='%23228B22'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%234A90E2'/><path d='M25 30 Q35 25 45 30 Q55 35 65 30 Q75 35 85 30 Q80 40 75 45 Q70 50 65 55 Q55 60 45 55 Q35 50 30 45 Q25 40 25 30' fill='%23228B22'/><path d='M15 60 Q25 55 35 60 Q45 65 55 60 Q65 65 75 60 Q80 70 75 80 Q65 85 55 80 Q45 75 35 80 Q25 75 20 70 Q15 65 15 60' fill='%23228B22'/><path d='M70 15 Q80 20 85 30 Q80 25 70 20 Q70 15' fill='%23228B22'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
