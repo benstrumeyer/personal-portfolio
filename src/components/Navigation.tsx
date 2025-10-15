@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { EXTERNAL_URLS, SVG_NAMESPACE } from '../constants/urls';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import './Navigation.css';
@@ -26,6 +26,8 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
 
   // Start letter reveal animation when navigation becomes visible
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     if (className === 'visible') {
       const totalLetters = headerText.length;
       const revealSpeed = 50; // milliseconds per letter
@@ -33,7 +35,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
       const revealLetters = () => {
         setVisibleLetters(prev => {
           if (prev < totalLetters) {
-            setTimeout(revealLetters, revealSpeed);
+            timeoutId = setTimeout(revealLetters, revealSpeed);
             return prev + 1;
           }
           return prev;
@@ -41,11 +43,18 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
       };
       
       // Start animation after a short delay
-      setTimeout(revealLetters, 200);
+      timeoutId = setTimeout(revealLetters, 200);
     } else {
       // Reset when hidden
       setVisibleLetters(0);
     }
+    
+    // Cleanup timeout on unmount or dependency change
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [className, headerText.length]);
 
   // Feature flag for hobbies section (development mode)

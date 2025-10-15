@@ -42,32 +42,34 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
       tl.set(clickHintRef.current, { opacity: 0 });
       
       // Animate sentence 1 character by character
-      sentence1Chars.current.forEach((charRef) => {
+      sentence1Chars.current.forEach((charRef, index) => {
         if (charRef) {
           tl.to(charRef, {
             opacity: 1,
             duration: 0.03,
             ease: "none"
-          });
+          }, index * 0.03);
         }
       });
       
       // Pause between sentences
       tl.to({}, { duration: 0.3 });
       
-      // Animate sentence 2 character by character
-      sentence2Chars.current.forEach((charRef) => {
+      // Animate sentence 2 character by character (starting after pause)
+      const sentence1Duration = sentence1Chars.current.length * 0.03;
+      sentence2Chars.current.forEach((charRef, index) => {
         if (charRef) {
           tl.to(charRef, {
             opacity: 1,
             duration: 0.03,
             ease: "none"
-          });
+          }, sentence1Duration + 0.3 + index * 0.03);
         }
       });
       
       // Show click hint with pulse animation
-      tl.to(clickHintRef.current, {
+      tl.set(clickHintRef.current, { visibility: 'visible' })
+      .to(clickHintRef.current, {
         opacity: 1,
         duration: 0.8,
         ease: "power2.out"
@@ -88,36 +90,36 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Render individual sentences
-  const renderSentence1 = () => (
-    <div ref={sentence1Ref} className="welcome-sentence" style={{ marginBottom: '20px' }}>
-      {sentence1.map((char, index) => (
-        <span 
-          key={index} 
-          ref={el => sentence1Chars.current[index] = el}
-          className="letter"
-          style={{ display: 'inline-block', opacity: 0 }}
-        >
-          {char === ' ' ? '\u00A0' : char}
-        </span>
-      ))}
-    </div>
-  );
+  // Helper function to render words as blocks
+  const renderWordsAsBlocks = (sentence: string[], charsRef: React.MutableRefObject<(HTMLSpanElement | null)[]>, sentenceRef: React.RefObject<HTMLDivElement>) => {
+    const words = sentence.join('').split(' ');
+    
+    return (
+      <div ref={sentenceRef} className="welcome-sentence" style={{ marginBottom: '20px' }}>
+        {words.map((word, wordIndex) => (
+          <span key={wordIndex} className="word-block" style={{ display: 'inline-block', marginRight: '0.2em' }}>
+            {word.split('').map((char, charIndex) => {
+              const globalIndex = words.slice(0, wordIndex).join(' ').length + charIndex;
+              return (
+                <span 
+                  key={charIndex} 
+                  ref={el => charsRef.current[globalIndex] = el}
+                  className="letter"
+                  style={{ display: 'inline-block', opacity: 0 }}
+                >
+                  {char}
+                </span>
+              );
+            })}
+          </span>
+        ))}
+      </div>
+    );
+  };
 
-  const renderSentence2 = () => (
-    <div ref={sentence2Ref} className="welcome-sentence" style={{ marginTop: '40px', marginBottom: '20px' }}>
-      {sentence2.map((char, index) => (
-        <span 
-          key={index} 
-          ref={el => sentence2Chars.current[index] = el}
-          className="letter"
-          style={{ display: 'inline-block', opacity: 0 }}
-        >
-          {char === ' ' ? '\u00A0' : char}
-        </span>
-      ))}
-    </div>
-  );
+  // Render individual sentences
+  const renderSentence1 = () => renderWordsAsBlocks(sentence1, sentence1Chars, sentence1Ref);
+  const renderSentence2 = () => renderWordsAsBlocks(sentence2, sentence2Chars, sentence2Ref);
 
 
   // Handle click to dismiss (both mobile and desktop)

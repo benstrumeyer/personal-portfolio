@@ -89,6 +89,13 @@
   transform: translateY(-40px);
 }
 
+/* Word blocks to prevent breaking during animation */
+.word-block {
+  white-space: nowrap;
+  word-break: keep-all;
+  display: inline-block;
+}
+
 /* Welcome Paragraph */
 .welcome-paragraph {
   margin: 0 0 1.5rem 0;
@@ -168,6 +175,7 @@
   transform: translateX(-50%);
   text-align: center;
   opacity: 0;
+  visibility: hidden;
   z-index: 10;
   pointer-events: none;
   width: 100%;
