@@ -92,7 +92,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
 
   // Add keyboard event listener for dismissing welcome screen
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
+    const handleKeyPress = (_event: KeyboardEvent) => {
       // Only dismiss if click hint is visible
       if (!isDismissed && clickHintRef.current?.style.opacity === '1') {
         handleDismiss();
