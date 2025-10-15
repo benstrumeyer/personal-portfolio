@@ -20,17 +20,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
   // Individual refs for each sentence
   const sentence1Ref = useRef<HTMLDivElement>(null);
   const sentence2Ref = useRef<HTMLDivElement>(null);
-  const sentence3Ref = useRef<HTMLDivElement>(null);
 
   // Text content split into characters
-  const sentence1 = "Hi. I'm Ben Strumeyer.".split('');
-  const sentence2 = "This is my personal portfolio.".split('');
-  const sentence3 = "Hit the connect button if you want to chat!".split('');
+  const sentence1 = "Hi, I'm Ben Strumeyer.".split('');
+  const sentence2 = "Hit the connect button if you want to chat!".split('');
 
   // Refs for each character
   const sentence1Chars = useRef<(HTMLSpanElement | null)[]>([]);
   const sentence2Chars = useRef<(HTMLSpanElement | null)[]>([]);
-  const sentence3Chars = useRef<(HTMLSpanElement | null)[]>([]);
 
   // Animation function
   const startAnimation = () => {
@@ -60,20 +57,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
       
       // Animate sentence 2 character by character
       sentence2Chars.current.forEach((charRef) => {
-        if (charRef) {
-          tl.to(charRef, {
-            opacity: 1,
-            duration: 0.03,
-            ease: "none"
-          });
-        }
-      });
-      
-      // Pause between sentences
-      tl.to({}, { duration: 0.5 });
-      
-      // Animate sentence 3 character by character
-      sentence3Chars.current.forEach((charRef) => {
         if (charRef) {
           tl.to(charRef, {
             opacity: 1,
@@ -136,20 +119,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
     </div>
   );
 
-  const renderSentence3 = () => (
-    <div ref={sentence3Ref} className="welcome-sentence" style={{ marginBottom: '20px' }}>
-      {sentence3.map((char, index) => (
-        <span 
-          key={index} 
-          ref={el => sentence3Chars.current[index] = el}
-          className="letter"
-          style={{ display: 'inline-block', opacity: 0 }}
-        >
-          {char === ' ' ? '\u00A0' : char}
-        </span>
-      ))}
-    </div>
-  );
 
   // Handle click to dismiss (both mobile and desktop)
   const handleClick = () => {
@@ -185,7 +154,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
                 <div className="welcome-text-content">
                   {renderSentence1()}
                   {renderSentence2()}
-                  {renderSentence3()}
                 </div>
             </div>
           </div>
@@ -206,7 +174,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
             <div className="welcome-text-content">
               {renderSentence1()}
               {renderSentence2()}
-              {renderSentence3()}
             </div>
           </div>
           
