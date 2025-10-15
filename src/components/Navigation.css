@@ -65,9 +65,11 @@
   padding: calc(var(--font-size) * 0.9) calc(var(--font-size) * 1.36);
   overflow: hidden;
   display: grid;
-  grid-template-columns: auto 1fr calc((var(--font-size) * 1.75) * var(--hovered, 0));
+  grid-template-columns:
+    calc((var(--font-size) * 1.75) * (1 - var(--hovered, 0)))
+    1fr
+    calc((var(--font-size) * 1.75) * var(--hovered, 0));
   align-items: center;
-  gap: calc(var(--font-size) * 0.5);
   transition: grid-template-columns var(--transition);
 }
 
@@ -86,39 +88,43 @@
   --hovered: 1;
 }
 
-.nav-button:hover .left-icon {
-  transform: translateX(calc(var(--font-size) * -0.3));
-}
-
-.nav-button:hover .button-text {
-  transform: translateX(calc(var(--font-size) * -0.2));
-}
 
 /* Left Icon Styles */
 .left-icon {
-  font-size: calc(var(--font-size) * 0.8);
-  transition: transform var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding-right: var(--padding);
+  width: var(--font-size);
 }
 
 /* Button Text */
 .button-text {
-  transition: transform var(--transition);
+  /* No specific styles needed */
 }
 
 /* Right Icon Styles */
 .right-icon {
   padding-left: var(--padding);
   width: var(--font-size);
-  opacity: var(--hovered, 0);
-  transition: opacity var(--transition);
 }
 
 .nav-button svg {
   display: inline-block;
   transition: translate var(--transition) ease-in-out, opacity var(--transition) ease-in-out;
+}
+
+/* Right Icon Arrow Animation */
+.nav-button .right-icon svg {
+  stroke-width: 3;
+  translate: calc((1 - var(--hovered, 0)) * (var(--font-size) * 3)) 8%;
+  width: calc(var(--font-size) * 1);
+  opacity: var(--hovered, 0);
+}
+
+/* Left Icon Animation */
+.nav-button .left-icon svg {
+  stroke-width: 3;
+  translate: calc(((var(--hovered, 0) * var(--font-size)) * -3) + 10%) 8%;
+  width: calc(var(--font-size) * 0.8 + 3px);
+  height: calc(var(--font-size) * 0.8 + 3px);
 }
 
 .nav-button:is(:focus-visible, :hover) {
@@ -195,6 +201,12 @@
   }
 }
 
+@media (max-width: 700px) {
+  .nav-button > span {
+    gap: calc(var(--font-size) * 0.15) !important;
+  }
+}
+
 @media (max-width: 480px) {
   .navigation {
     gap: 40px; /* Smaller gap for mobile */
@@ -205,7 +217,8 @@
   }
   
   .nav-button {
-    width: 100%;
+    width: 80%;
+    max-width: 250px;
   }
   
   .nav-button > span {
@@ -213,7 +226,7 @@
     transition: none !important;
     justify-content: center;
     text-align: center;
-    gap: calc(var(--font-size) * 0.3) !important;
+    gap: calc(var(--font-size) * 0.1) !important;
     display: flex !important;
     align-items: center;
     justify-content: center;
@@ -227,11 +240,11 @@
     font-size: calc(var(--font-size) * 0.7);
   }
   
-  /* Disable hover effects on mobile */
-  .nav-button:hover .left-icon,
-  .nav-button:hover .button-text {
-    transform: none !important;
+  .button-text {
+    padding: 0 !important;
   }
+  
+  /* Keep hover effects on desktop */
   
   :root {
     --font-size: 1.5rem;
@@ -241,7 +254,7 @@
 @media (max-width: 480px) {
   .nav-buttons {
     gap: 14px;
-    max-width: 280px;
+    max-width: 220px;
   }
   
   :root {
