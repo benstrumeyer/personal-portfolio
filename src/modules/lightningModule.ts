@@ -44,22 +44,22 @@ export const createLightningModule = (): SkyModuleHook => {
     canvasWidth: 800,
     canvasHeight: 600,
     lastStrikeTime: 0,
-    strikeInterval: 3000, // 3 seconds between strikes
+    strikeInterval: 3000, // 2 seconds between strikes (more frequent for testing)
     nextStrikeId: 0,
   };
 
   // Generate a jagged lightning path from top to bottom
   const generateLightningPath = (startX: number, endY: number): { x: number; y: number }[] => {
     const segments: { x: number; y: number }[] = [];
-    const segmentCount = Math.floor(endY / 20); // Segment every 20 pixels
+    const segmentCount = Math.floor(endY / 15); // Segment every 15 pixels for more detail
     
     for (let i = 0; i <= segmentCount; i++) {
       const progress = i / segmentCount;
       const y = progress * endY;
       
-      // Add randomness to create jagged lightning effect
+      // Add controlled randomness for jagged lightning effect
       const baseX = startX;
-      const randomOffset = (Math.random() - 0.5) * 30; // ±15 pixel variation
+      const randomOffset = (Math.random() - 0.5) * 20; // ±10 pixel variation (reduced from 30)
       const x = baseX + randomOffset;
       
       segments.push({ x, y });
@@ -71,8 +71,8 @@ export const createLightningModule = (): SkyModuleHook => {
   // Create a new lightning strike
   const createLightningStrike = (): LightningStrike => {
     const x = Math.random() * state.canvasWidth;
-    const intensity = 0.8 + Math.random() * 0.4; // 0.8 to 1.2 intensity
-    const width = 0.5 + Math.random() * 1.0; // 0.5-1.5 pixel width (much thinner)
+    const intensity = 0.5 + Math.random() * 0.3; // 0.5 to 0.8 intensity (subtle)
+    const width = 3; // Fixed 3px width for jagged lightning
     const glowRadius = 15 + Math.random() * 25; // 15-40 pixel glow
     
     return {
@@ -84,8 +84,8 @@ export const createLightningModule = (): SkyModuleHook => {
       intensity,
       glowRadius,
       isActive: true,
-      flashDuration: 100 + Math.random() * 200, // 100-300ms flash
-      timeRemaining: 100 + Math.random() * 200,
+      flashDuration: 50 + Math.random() * 100, // 50-150ms flash (shorter)
+      timeRemaining: 50 + Math.random() * 100,
     };
   };
 
@@ -154,7 +154,7 @@ export const createLightningModule = (): SkyModuleHook => {
     const alpha = lightningIntensity * 255;
     
     p.stroke(255, 255, 255, alpha); // White lightning
-    p.strokeWeight(strike.width * 0.3); // Much thinner lightning
+    p.strokeWeight(strike.width); // Use the actual width (1-3px)
     p.noFill();
     
     // Draw jagged lightning path

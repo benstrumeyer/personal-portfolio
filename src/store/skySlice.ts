@@ -82,7 +82,7 @@ const initialState: SkyState = {
     currentTime: Date.now(),
     dayDuration: 360000, // 6 minutes for testing (half speed)
     timeMultiplier: 1.0,
-    dayProgress: 0.25, // Start at ~3 o'clock position (sun visible - daytime)
+    dayProgress: 0.75, // Start at ~9 o'clock position (moon visible - nighttime)
     isPaused: false,
     lastUpdateTime: Date.now(),
   },
