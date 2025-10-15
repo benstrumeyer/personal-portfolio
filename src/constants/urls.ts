@@ -1,6 +1,6 @@
 // External URLs
 export const EXTERNAL_URLS = {
-  RESUME: '/Ben_Strumeyer_Resume.pdf',
+  RESUME: 'https://benstrumeyer.github.io/portfolio/Ben_Strumeyer_Resume.pdf', // Updated URL with @ prefix
   GITHUB: 'https://github.com/benstrumeyer',
   LINKEDIN: 'https://www.linkedin.com/in/ben-strumeyer-8aa897113',
   INSTAGRAM: 'https://www.instagram.com/ben_strumeyer',

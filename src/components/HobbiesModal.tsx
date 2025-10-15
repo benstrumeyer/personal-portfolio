@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import './HobbiesModal.css';
 
 interface HobbiesModalProps {
@@ -43,7 +42,6 @@ const HobbiesModal: React.FC<HobbiesModalProps> = ({ isOpen, onClose }) => {
   const [showClickHint, setShowClickHint] = useState(false);
   const [hoveredSport, setHoveredSport] = useState<string | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const { isMobile } = useMediaQuery();
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Letter reveal animation (same as welcome screen)

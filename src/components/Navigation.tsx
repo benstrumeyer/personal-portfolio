@@ -16,7 +16,7 @@ interface NavButton {
   leftIcon?: string | React.ReactNode;
   rightIcon?: string;
   target?: string;
-  onClick?: () => void;
+  onClick?: (() => void) | undefined;
 }
 
 const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick, onHobbiesClick, isModalOpen = false }) => {
@@ -164,6 +164,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
             href={button.href}
             target={button.target}
             rel={button.target === '_blank' ? 'noopener noreferrer' : undefined}
+            download={button.label === 'Resume' ? 'Ben_Strumeyer_Resume.pdf' : undefined}
             className="nav-button"
             onClick={button.label === 'Connect' ? (e) => {
               e.preventDefault();

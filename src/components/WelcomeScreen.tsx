@@ -32,7 +32,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
       
       // Calculate total letters across all paragraphs
       const totalLetters = paragraphs.join(' ').length;
-      const revealSpeed = 50; // milliseconds per letter (slower for smoother effect)
+      const revealSpeed = 25; // milliseconds per letter (2x faster)
       
       const revealLetters = () => {
         setVisibleLetters(prev => {

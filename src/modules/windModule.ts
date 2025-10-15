@@ -229,6 +229,8 @@ export const createWindModule = (): SkyModuleHook => {
     
     // Expose wind influence function for other modules
     getWindInfluence: (x: number, y: number) => getWindInfluence(x, y),
+  } as SkyModuleHook & {
+    getWindInfluence: (x: number, y: number) => { x: number; y: number; strength: number };
   };
 
   return module;
