@@ -10,79 +10,150 @@ interface WelcomeScreenProps {
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
-  const [visibleLetters, setVisibleLetters] = useState(0);
 
   const isMobile = useMediaQuery('(max-width: 1023px)');
   
   // Refs for GSAP animations
   const welcomeContentRef = useRef<HTMLDivElement>(null);
   const clickHintRef = useRef<HTMLDivElement>(null);
+  
+  // Individual refs for each sentence
+  const sentence1Ref = useRef<HTMLDivElement>(null);
+  const sentence2Ref = useRef<HTMLDivElement>(null);
+  const sentence3Ref = useRef<HTMLDivElement>(null);
 
-  // Text content - same for mobile and desktop
-  const paragraphs = [
-    "Hi. I'm Ben Strumeyer.",
-    "This is my personal portfolio where you can learn more about me.",
-    "Hit the connect button if you want to chat!"
-  ];
+  // Text content split into characters
+  const sentence1 = "Hi. I'm Ben Strumeyer.".split('');
+  const sentence2 = "This is my personal portfolio.".split('');
+  const sentence3 = "Hit the connect button if you want to chat!".split('');
 
-  // Start the letter fade-in animation after component mounts
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-      
-      // Calculate total letters across all paragraphs
-      const totalLetters = paragraphs.join(' ').length;
-      const revealSpeed = 25; // milliseconds per letter (2x faster)
-      
-      const revealLetters = () => {
-        setVisibleLetters(prev => {
-          if (prev < totalLetters) {
-            setTimeout(revealLetters, revealSpeed);
-            return prev + 1;
-          }
-          return prev;
-        });
-      };
-      
-      revealLetters();
-      
-    }, 300);
+  // Refs for each character
+  const sentence1Chars = useRef<(HTMLSpanElement | null)[]>([]);
+  const sentence2Chars = useRef<(HTMLSpanElement | null)[]>([]);
+  const sentence3Chars = useRef<(HTMLSpanElement | null)[]>([]);
 
-    return () => clearTimeout(timer);
-  }, [paragraphs]);
-
-  // Render paragraphs with letter animation
-  const renderParagraphs = () => {
-    let currentLetterIndex = 0;
+  // Animation function
+  const startAnimation = () => {
+    setIsVisible(true);
     
-    return paragraphs.map((paragraph, paragraphIndex) => {
-      const paragraphLetters = paragraph.split('');
+    // Wait for DOM to be ready
+    setTimeout(() => {
+      // Create a timeline
+      const tl = gsap.timeline();
       
-      return (
-        <p key={paragraphIndex} className="welcome-paragraph">
-          {paragraphLetters.map((char, charIndex) => {
-            const globalIndex = currentLetterIndex + charIndex;
-            const isVisible = globalIndex < visibleLetters;
-            
-            return (
-              <span 
-                key={charIndex} 
-                className={`letter ${isVisible ? 'visible' : ''}`}
-              >
-                {char === ' ' ? '\u00A0' : char}
-              </span>
-            );
-          })}
-        </p>
-      );
+      // Initially hide click hint
+      tl.set(clickHintRef.current, { opacity: 0 });
       
-      currentLetterIndex += paragraph.length + 1; // +1 for space between paragraphs
-    });
+      // Animate sentence 1 character by character
+      sentence1Chars.current.forEach((charRef) => {
+        if (charRef) {
+          tl.to(charRef, {
+            opacity: 1,
+            duration: 0.03,
+            ease: "none"
+          });
+        }
+      });
+      
+      // Pause between sentences
+      tl.to({}, { duration: 0.3 });
+      
+      // Animate sentence 2 character by character
+      sentence2Chars.current.forEach((charRef) => {
+        if (charRef) {
+          tl.to(charRef, {
+            opacity: 1,
+            duration: 0.03,
+            ease: "none"
+          });
+        }
+      });
+      
+      // Pause between sentences
+      tl.to({}, { duration: 0.5 });
+      
+      // Animate sentence 3 character by character
+      sentence3Chars.current.forEach((charRef) => {
+        if (charRef) {
+          tl.to(charRef, {
+            opacity: 1,
+            duration: 0.03,
+            ease: "none"
+          });
+        }
+      });
+      
+      // Show click hint with pulse animation
+      tl.to(clickHintRef.current, {
+        opacity: 1,
+        duration: 0.8,
+        ease: "power2.out"
+      })
+      .to(clickHintRef.current, {
+        scale: 1.05,
+        duration: 1.5,
+        ease: "power2.inOut",
+        yoyo: true,
+        repeat: -1
+      });
+    }, 100);
   };
+
+  // Start animation on mount
+  useEffect(() => {
+    const timer = setTimeout(startAnimation, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Render individual sentences
+  const renderSentence1 = () => (
+    <div ref={sentence1Ref} className="welcome-sentence" style={{ marginBottom: '20px' }}>
+      {sentence1.map((char, index) => (
+        <span 
+          key={index} 
+          ref={el => sentence1Chars.current[index] = el}
+          className="letter"
+          style={{ display: 'inline-block', opacity: 0 }}
+        >
+          {char === ' ' ? '\u00A0' : char}
+        </span>
+      ))}
+    </div>
+  );
+
+  const renderSentence2 = () => (
+    <div ref={sentence2Ref} className="welcome-sentence" style={{ marginBottom: '20px' }}>
+      {sentence2.map((char, index) => (
+        <span 
+          key={index} 
+          ref={el => sentence2Chars.current[index] = el}
+          className="letter"
+          style={{ display: 'inline-block', opacity: 0 }}
+        >
+          {char === ' ' ? '\u00A0' : char}
+        </span>
+      ))}
+    </div>
+  );
+
+  const renderSentence3 = () => (
+    <div ref={sentence3Ref} className="welcome-sentence" style={{ marginBottom: '20px' }}>
+      {sentence3.map((char, index) => (
+        <span 
+          key={index} 
+          ref={el => sentence3Chars.current[index] = el}
+          className="letter"
+          style={{ display: 'inline-block', opacity: 0 }}
+        >
+          {char === ' ' ? '\u00A0' : char}
+        </span>
+      ))}
+    </div>
+  );
 
   // Handle click to dismiss (both mobile and desktop)
   const handleClick = () => {
-    if (!isDismissed && visibleLetters >= paragraphs.join(' ').length) {
+    if (!isDismissed && clickHintRef.current?.style.opacity === '1') {
       setIsDismissed(true);
       
       // Fade out animation
@@ -111,14 +182,16 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
         <>
           <div ref={welcomeContentRef} className="welcome-content">
             <div className="welcome-text">
-              <div className="welcome-text-content">
-                {renderParagraphs()}
-              </div>
+                <div className="welcome-text-content">
+                  {renderSentence1()}
+                  {renderSentence2()}
+                  {renderSentence3()}
+                </div>
             </div>
           </div>
           
           {/* Mobile click hint */}
-          {!isDismissed && visibleLetters >= paragraphs.join(' ').length && (
+          {!isDismissed && (
             <div ref={clickHintRef} className="click-hint">
               <p>Click anywhere to continue</p>
             </div>
@@ -131,12 +204,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
         <>
           <div ref={welcomeContentRef} className={`desktop-welcome ${isDismissed ? 'fade-out' : ''}`}>
             <div className="welcome-text-content">
-              {renderParagraphs()}
+              {renderSentence1()}
+              {renderSentence2()}
+              {renderSentence3()}
             </div>
           </div>
           
           {/* Desktop click hint */}
-          {!isDismissed && visibleLetters >= paragraphs.join(' ').length && (
+          {!isDismissed && (
             <div ref={clickHintRef} className="click-hint">
               <p>Click anywhere to continue</p>
             </div>

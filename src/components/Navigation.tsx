@@ -48,6 +48,9 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
     }
   }, [className, headerText.length]);
 
+  // Feature flag for hobbies section (development mode)
+  const showHobbies = import.meta.env['VITE_SHOW_HOBBIES'] === 'true';
+
   const buttons: NavButton[] = [
     {
       label: 'Connect',
@@ -108,7 +111,8 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
         </svg>
       )
     },
-    {
+    // Conditionally include Hobbies button based on feature flag
+    ...(showHobbies ? [{
       label: 'Hobbies',
       href: '#',
       target: '_self',
@@ -120,7 +124,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
           <path d="M5 15L6.09 18.26L9 19L6.09 19.74L5 23L3.91 19.74L1 19L3.91 18.26L5 15Z" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.8"/>
         </svg>
       )
-    }
+    }] : [])
   ];
 
   return (

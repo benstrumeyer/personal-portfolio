@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   base: '/portfolio/', // Replace 'personal-portfolio' with your actual repository name
   resolve: {
@@ -42,5 +42,7 @@ export default defineConfig({
   },
   define: {
     global: 'globalThis',
+    // Set environment variables based on mode
+    'import.meta.env.VITE_SHOW_HOBBIES': mode === 'development' ? 'true' : 'false',
   },
-})
+}))
