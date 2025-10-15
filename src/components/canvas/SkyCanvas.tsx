@@ -9,6 +9,8 @@ import { createSnowModule } from '@/modules/snowModule';
 import { createMountainsModule } from '@/modules/mountainsModule';
 import { createLightningModule } from '@/modules/lightningModule';
 import { createRainModule } from '@/modules/rainModule';
+import { createLeavesModule } from '@/modules/leavesModule';
+import { createWindModule } from '@/modules/windModule';
 import { useResponsiveConfig } from '@/hooks/useMediaQuery';
 import store from '@/store';
 
@@ -130,6 +132,8 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
     mountains: () => createMountainsModule(),
     lightning: () => createLightningModule(),
     rain: () => createRainModule(),
+    leaves: () => createLeavesModule(),
+    wind: () => createWindModule(),
     // Additional modules will be added in future tasks
   }), []);
 
@@ -175,6 +179,7 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
             })
             .filter((module): module is SkyModuleHook => module !== null)
             .sort((a, b) => a.priority - b.priority); // Sort by priority for rendering order
+
 
           // SkyCanvas initialized
         };

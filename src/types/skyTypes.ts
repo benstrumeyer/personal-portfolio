@@ -3,7 +3,7 @@ import p5 from 'p5';
 /**
  * Union type for identifying different sky module types
  */
-export type SkyModuleType = 'celestial' | 'clouds' | 'rain' | 'snow' | 'fog' | 'mountains' | 'lightning';
+export type SkyModuleType = 'celestial' | 'clouds' | 'rain' | 'snow' | 'fog' | 'mountains' | 'lightning' | 'leaves' | 'wind';
 
 /**
  * Configuration object for initializing sky modules

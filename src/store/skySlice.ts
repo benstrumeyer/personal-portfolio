@@ -82,7 +82,7 @@ const initialState: SkyState = {
     currentTime: Date.now(),
     dayDuration: 360000, // 6 minutes for testing (half speed)
     timeMultiplier: 1.0,
-    dayProgress: 0.083, // Start at ~1 o'clock position (1/12th through day)
+    dayProgress: 0.25, // Start at ~3 o'clock position (sun visible - daytime)
     isPaused: false,
     lastUpdateTime: Date.now(),
   },
@@ -126,11 +126,13 @@ const initialState: SkyState = {
     enabled: {
       celestial: true,
       clouds: false,
-      rain: true,
-      snow: true,
+      rain: false,
+      snow: false,
       fog: false,
       mountains: true,
-      lightning: true,
+      lightning: false,
+      leaves: true,
+      wind: false,
     },
     configurations: {
       celestial: {
@@ -192,6 +194,24 @@ const initialState: SkyState = {
           color: '#C8D8F0',
         },
       },
+      leaves: {
+        performanceMode: 'high',
+        customSettings: {
+          maxLeaves: 15,
+          fallSpeed: 1.0,
+          windStrength: 0.3,
+          colors: ['#8B4513', '#A0522D', '#D2B48C', '#CD853F', '#DEB887'],
+        },
+      },
+      wind: {
+        performanceMode: 'high',
+        customSettings: {
+          gustInterval: 2000,
+          maxGusts: 5,
+          gustStrength: 0.8,
+          globalWindStrength: 0.5,
+        },
+      },
     },
     priorities: {
       celestial: 100,
@@ -201,6 +221,8 @@ const initialState: SkyState = {
       fog: 20,
       mountains: 50,
       lightning: 40, // Render below mountains
+      leaves: 150, // Render above mountains, below celestial
+      wind: 10, // Low priority, affects other modules
     },
   },
   performance: {
@@ -215,6 +237,8 @@ const initialState: SkyState = {
       fog: 'medium',
       mountains: 'high',
       lightning: 'high',
+      leaves: 'high',
+      wind: 'high',
     },
     adaptiveQuality: true,
     lastFrameTime: Date.now(),

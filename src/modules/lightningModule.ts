@@ -210,8 +210,18 @@ export const createLightningModule = (): SkyModuleHook => {
       };
     },
     
-    update: (_p: p5, deltaTime: number, _globalState: any) => {
+    update: (_p: p5, deltaTime: number, globalState: any) => {
       if (!state.isInitialized) return;
+      
+      // Only show lightning when moon is visible (night time)
+      const dayProgress = globalState.global?.dayProgress || 0;
+      const isMoonVisible = dayProgress > 0.5; // Moon is visible from 0.5-1.0
+      
+      if (!isMoonVisible) {
+        // Clear lightning strikes during day time (when sun is visible)
+        state.strikes = [];
+        return;
+      }
       
       updateLightningStrikes(deltaTime);
     },

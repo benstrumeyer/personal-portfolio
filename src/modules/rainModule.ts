@@ -175,8 +175,18 @@ export const createRainModule = (): SkyModuleHook => {
       }
     },
     
-    update: (p: p5, _deltaTime: number, _globalState: any) => {
+    update: (p: p5, _deltaTime: number, globalState: any) => {
       if (!state.isInitialized) return;
+      
+      // Only show rain when moon is visible (night time)
+      const dayProgress = globalState.global?.dayProgress || 0;
+      const isMoonVisible = dayProgress > 0.5; // Moon is visible from 0.5-1.0
+      
+      if (!isMoonVisible) {
+        // Clear rain drops during day time (when sun is visible)
+        state.rainDrops = [];
+        return;
+      }
       
       // Update wind strength based on time for realistic variation
       state.windStrength = 0.3 + p.sin(Date.now() * 0.0005) * 0.4;

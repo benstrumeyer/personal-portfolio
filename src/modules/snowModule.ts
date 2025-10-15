@@ -178,6 +178,16 @@ export const createSnowModule = (): SkyModuleHook => {
     update: (_p: p5, deltaTime: number, globalState: any) => {
       if (!state.isInitialized) return;
       
+      // Only show snow when moon is visible (night time)
+      const dayProgress = globalState.global?.dayProgress || 0;
+      const isMoonVisible = dayProgress > 0.5; // Moon is visible from 0.5-1.0
+      
+      if (!isMoonVisible) {
+        // Clear snowflakes during day time (when sun is visible)
+        state.snowflakes = [];
+        return;
+      }
+      
       // Get current time for gradual buildup
       const currentTime = globalState.global?.currentTime || Date.now();
       
