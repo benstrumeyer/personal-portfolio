@@ -18,18 +18,20 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
   const welcomeContentRef = useRef<HTMLDivElement>(null);
   const clickHintRef = useRef<HTMLDivElement>(null);
 
-  // Text content
-  const fullText = isMobile 
-    ? "Hi. I'm Ben Strumeyer.\n\nThis is my personal portfolio where you can learn more about me.\n\nHit the connect button if you want to chat!"
-    : "Hi. I'm Ben Strumeyer.\n\nThis is my personal portfolio where you can learn more about me.\n\nHit the connect button if you want to chat!";
+  // Text content - same for mobile and desktop
+  const paragraphs = [
+    "Hi. I'm Ben Strumeyer.",
+    "This is my personal portfolio where you can learn more about me.",
+    "Hit the connect button if you want to chat!"
+  ];
 
   // Start the letter fade-in animation after component mounts
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
       
-      // Start revealing letters one by one
-      const totalLetters = fullText.length;
+      // Calculate total letters across all paragraphs
+      const totalLetters = paragraphs.join(' ').length;
       const revealSpeed = 50; // milliseconds per letter (slower for smoother effect)
       
       const revealLetters = () => {
@@ -47,12 +49,40 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [fullText]);
+  }, [paragraphs]);
 
+  // Render paragraphs with letter animation
+  const renderParagraphs = () => {
+    let currentLetterIndex = 0;
+    
+    return paragraphs.map((paragraph, paragraphIndex) => {
+      const paragraphLetters = paragraph.split('');
+      
+      return (
+        <p key={paragraphIndex} className="welcome-paragraph">
+          {paragraphLetters.map((char, charIndex) => {
+            const globalIndex = currentLetterIndex + charIndex;
+            const isVisible = globalIndex < visibleLetters;
+            
+            return (
+              <span 
+                key={charIndex} 
+                className={`letter ${isVisible ? 'visible' : ''}`}
+              >
+                {char === ' ' ? '\u00A0' : char}
+              </span>
+            );
+          })}
+        </p>
+      );
+      
+      currentLetterIndex += paragraph.length + 1; // +1 for space between paragraphs
+    });
+  };
 
   // Handle click to dismiss (both mobile and desktop)
   const handleClick = () => {
-    if (!isDismissed && visibleLetters >= fullText.length) {
+    if (!isDismissed && visibleLetters >= paragraphs.join(' ').length) {
       setIsDismissed(true);
       
       // Fade out animation
@@ -82,20 +112,13 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
           <div ref={welcomeContentRef} className="welcome-content">
             <div className="welcome-text">
               <div className="welcome-text-content">
-                {fullText.split('').map((char, index) => (
-                  <span 
-                    key={index} 
-                    className={`letter ${index < visibleLetters ? 'visible' : ''}`}
-                  >
-                    {char}
-                  </span>
-                ))}
+                {renderParagraphs()}
               </div>
             </div>
           </div>
           
           {/* Mobile click hint */}
-          {!isDismissed && visibleLetters >= fullText.length && (
+          {!isDismissed && visibleLetters >= paragraphs.join(' ').length && (
             <div ref={clickHintRef} className="click-hint">
               <p>Click anywhere to continue</p>
             </div>
@@ -108,19 +131,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
         <>
           <div ref={welcomeContentRef} className={`desktop-welcome ${isDismissed ? 'fade-out' : ''}`}>
             <div className="welcome-text-content">
-              {fullText.split('').map((char, index) => (
-                <span 
-                  key={index} 
-                  className={`letter ${index < visibleLetters ? 'visible' : ''}`}
-                >
-                  {char}
-                </span>
-              ))}
+              {renderParagraphs()}
             </div>
           </div>
           
           {/* Desktop click hint */}
-          {!isDismissed && visibleLetters >= fullText.length && (
+          {!isDismissed && visibleLetters >= paragraphs.join(' ').length && (
             <div ref={clickHintRef} className="click-hint">
               <p>Click anywhere to continue</p>
             </div>

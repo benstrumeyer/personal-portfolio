@@ -6,6 +6,7 @@ import './Navigation.css';
 interface NavigationProps {
   className?: string;
   onContactClick?: (event: React.MouseEvent) => void;
+  onHobbiesClick?: () => void;
   isModalOpen?: boolean;
 }
 
@@ -15,9 +16,10 @@ interface NavButton {
   leftIcon?: string | React.ReactNode;
   rightIcon?: string;
   target?: string;
+  onClick?: () => void;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick, isModalOpen = false }) => {
+const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick, onHobbiesClick, isModalOpen = false }) => {
   const [visibleLetters, setVisibleLetters] = useState(0);
   const headerText = "Ben Strumeyer";
   const isMobile = useMediaQuery('(max-width: 1023px)');
@@ -105,6 +107,19 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
           <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" opacity="0.8"/>
         </svg>
       )
+    },
+    {
+      label: 'Hobbies',
+      href: '#',
+      target: '_self',
+      onClick: onHobbiesClick,
+      leftIcon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.8"/>
+          <path d="M19 15L20.09 18.26L23 19L20.09 19.74L19 23L17.91 19.74L15 19L17.91 18.26L19 15Z" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.8"/>
+          <path d="M5 15L6.09 18.26L9 19L6.09 19.74L5 23L3.91 19.74L1 19L3.91 18.26L5 15Z" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.8"/>
+        </svg>
+      )
     }
   ];
 
@@ -135,7 +150,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
                 key={index} 
                 className={`letter ${index < visibleLetters ? 'visible' : ''}`}
               >
-                {char}
+                {char === ' ' ? '\u00A0' : char}
               </span>
             ))}
           </h1>
@@ -154,6 +169,11 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
               e.preventDefault();
               if (onContactClick) {
                 onContactClick(e);
+              }
+            } : button.label === 'Hobbies' ? (e) => {
+              e.preventDefault();
+              if (button.onClick) {
+                button.onClick();
               }
             } : undefined}
           >

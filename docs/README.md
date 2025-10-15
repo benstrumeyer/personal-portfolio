@@ -26,6 +26,9 @@ Deployment, monitoring, and maintenance documentation.
 ### `/schemas/`
 Data models, API schemas, and type definitions.
 
+### `/steering/`
+Comprehensive AI steering guidelines for consistent behavior across all development tools and sessions.
+
 ## AI Development Workflow
 
 This project follows a spec-driven development approach:
@@ -33,6 +36,7 @@ This project follows a spec-driven development approach:
 1. **Planning Phase:** Use AI Planner to create feature specifications
 2. **Execution Phase:** Use AI Executor to implement features from specs
 3. **Steering:** Configure AI behavior via `.ai-rules/` directory
+4. **Guidelines:** Use comprehensive steering documentation in `docs/steering/`
 
 ## Contributing
 
