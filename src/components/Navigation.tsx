@@ -138,7 +138,7 @@ const Navigation: React.FC<NavigationProps> = ({ className = '', onContactClick,
                 key={index} 
                 className={`letter ${index < visibleLetters ? 'visible' : ''}`}
               >
-                {char}
+                {char === ' ' ? '\u00A0' : char}
               </span>
             ))}
           </h1>
