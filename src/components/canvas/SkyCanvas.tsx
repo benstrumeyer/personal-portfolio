@@ -54,15 +54,6 @@ const SkyCanvasInner: React.FC<SkyCanvasProps> = ({
       const newWidth = width || (containerElement ? containerElement.clientWidth : window.innerWidth);
       const newHeight = height || (containerElement ? containerElement.clientHeight : window.innerHeight);
       
-      console.log('SkyCanvas resize:', {
-        windowWidth: window.innerWidth,
-        windowHeight: window.innerHeight,
-        containerWidth: containerElement?.clientWidth,
-        containerHeight: containerElement?.clientHeight,
-        newWidth,
-        newHeight,
-        currentDimensions: dimensions
-      });
       
       // Only update if dimensions actually changed
       if (newWidth !== dimensions.width || newHeight !== dimensions.height) {

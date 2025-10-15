@@ -177,7 +177,7 @@ export const useCelestialModule = (): SkyModuleHook => {
       performanceMode: config.performanceMode,
     }));
     
-    console.log('Celestial module initialized with config:', config);
+    // Celestial module initialized
   }, []);
 
   const update = useCallback((_p: p5, _deltaTime: number, globalState: any) => {
@@ -202,7 +202,7 @@ export const useCelestialModule = (): SkyModuleHook => {
       performanceMode: mode,
     }));
     
-    console.log(`Celestial module performance mode set to: ${mode}`);
+    // Celestial module performance mode set
   }, []);
 
   // Create the hook object that implements SkyModuleHook interface
@@ -227,7 +227,7 @@ export const useCelestialModule = (): SkyModuleHook => {
   // Cleanup effect
   useEffect(() => {
     return () => {
-      console.log('Celestial module cleanup');
+      // Celestial module cleanup
       setState(prev => ({
         ...prev,
         isInitialized: false,

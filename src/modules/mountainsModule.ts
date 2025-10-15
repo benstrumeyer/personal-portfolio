@@ -102,16 +102,7 @@ export const createMountainsModule = (): SkyModuleHook => {
     // Determine if we're on mobile (width < 768px)
     const isMobile = state.canvasWidth < 768;
     
-    // Debug logging (temporary)
-    if (Math.random() < 0.001) { // Log very rarely to avoid spam
-      console.log('Mountains Debug:', {
-        canvasWidth: state.canvasWidth,
-        isMobile,
-        layerId: layer.id,
-        originalHeight: layer.heightFactor,
-        adjustedHeight: isMobile ? layer.heightFactor * 0.5 : layer.heightFactor
-      });
-    }
+    // Debug logging removed
     
     // Adjust height factor for mobile and desktop responsiveness
     let adjustedHeightFactor = layer.heightFactor;
@@ -199,15 +190,7 @@ export const createMountainsModule = (): SkyModuleHook => {
       const prevWidth = state.canvasWidth;
       const prevHeight = state.canvasHeight;
       
-      // Debug logging
-      console.log('Mountains updateCanvasDimensions:', {
-        prevWidth,
-        prevHeight,
-        newWidth: width,
-        newHeight: height,
-        prevIsMobile: prevWidth < 768,
-        newIsMobile: width < 768
-      });
+      // Debug logging removed
       
       state = {
         ...state,
@@ -221,7 +204,7 @@ export const createMountainsModule = (): SkyModuleHook => {
       const significantChange = widthChange > 50 || heightChange > 50;
       
       if (significantChange || prevWidth === 0 || prevHeight === 0) {
-        console.log('Reinitializing mountains due to significant change');
+        // Reinitializing mountains due to significant change
         // Reinitialize mountains with new dimensions
         initializeMountains();
       }

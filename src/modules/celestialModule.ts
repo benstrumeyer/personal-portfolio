@@ -315,12 +315,7 @@ export const createCelestialModule = (): SkyModuleHook => {
     },
     
     updateResponsiveConfig: (config: ResponsiveConfig) => {
-      // Debug logging
-      console.log('Celestial updateResponsiveConfig:', {
-        config,
-        canvasWidth: state.canvasWidth,
-        isMobile: state.canvasWidth < 768
-      });
+      // Debug logging removed
       
       state = {
         ...state,

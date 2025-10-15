@@ -10,14 +10,6 @@ import { SkyCanvas } from '../SkyCanvas';
 
 // Test structure validation
 export const validateSkyCanvasStructure = () => {
-  console.log('✅ SkyCanvas component structure validation:');
-  console.log('  - React component with P5.js integration: PASS');
-  console.log('  - Hook-based module management system: PASS');
-  console.log('  - Hook lifecycle integration with P5.js animation loop: PASS');
-  console.log('  - Module registry for dynamic module loading: PASS');
-  console.log('  - Proper cleanup and lifecycle management: PASS');
-  console.log('  - Window resize handling: PASS');
-  console.log('  - Performance mode configuration: PASS');
   
   return true;
 };
@@ -63,6 +55,6 @@ export const validateComponentStructure = () => {
     'Window resize handling is implemented'
   ];
   
-  checks.forEach(check => console.log(`✅ ${check}`));
+  checks.forEach(check => {});
   return true;
 };
