@@ -81,7 +81,7 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
+# public - commented out to allow resume and other assets
 
 # Storybook build outputs
 .out
