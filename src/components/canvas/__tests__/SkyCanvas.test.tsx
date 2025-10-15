@@ -17,7 +17,6 @@ export const validateSkyCanvasStructure = () => {
   console.log('  - Module registry for dynamic module loading: PASS');
   console.log('  - Proper cleanup and lifecycle management: PASS');
   console.log('  - Window resize handling: PASS');
-  console.log('  - Mock sky state integration: PASS');
   console.log('  - Performance mode configuration: PASS');
   
   return true;
