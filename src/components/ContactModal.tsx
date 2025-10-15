@@ -30,6 +30,13 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -120,6 +127,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
               name="message"
               value={formData.message}
               onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               rows={4}
             />
           </div>

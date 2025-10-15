@@ -90,6 +90,24 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Add keyboard event listener for dismissing welcome screen
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Only dismiss if click hint is visible
+      if (!isDismissed && clickHintRef.current?.style.opacity === '1') {
+        handleDismiss();
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('keydown', handleKeyPress);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isDismissed]);
+
   // Helper function to render words as blocks
   const renderWordsAsBlocks = (sentence: string[], charsRef: React.MutableRefObject<(HTMLSpanElement | null)[]>, sentenceRef: React.RefObject<HTMLDivElement>) => {
     const words = sentence.join('').split(' ');
@@ -122,8 +140,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
   const renderSentence2 = () => renderWordsAsBlocks(sentence2, sentence2Chars, sentence2Ref);
 
 
-  // Handle click to dismiss (both mobile and desktop)
-  const handleClick = () => {
+  // Handle click or keyboard to dismiss (both mobile and desktop)
+  const handleDismiss = () => {
     if (!isDismissed && clickHintRef.current?.style.opacity === '1') {
       setIsDismissed(true);
       
@@ -147,7 +165,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
 
 
   return (
-    <div className={`welcome-screen ${isVisible ? 'visible' : ''} ${isDismissed ? 'dismissed' : ''}`} onClick={handleClick}>
+    <div className={`welcome-screen ${isVisible ? 'visible' : ''} ${isDismissed ? 'dismissed' : ''}`} onClick={handleDismiss}>
       {/* Mobile Welcome Screen */}
       {isMobile && (
         <>
@@ -163,7 +181,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
           {/* Mobile click hint */}
           {!isDismissed && (
             <div ref={clickHintRef} className="click-hint">
-              <p>Click anywhere to continue</p>
+              <p>Click anywhere or press any key to continue</p>
             </div>
           )}
         </>
@@ -182,7 +200,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
           {/* Desktop click hint */}
           {!isDismissed && (
             <div ref={clickHintRef} className="click-hint">
-              <p>Click anywhere to continue</p>
+              <p>Click anywhere or press any key to continue</p>
             </div>
           )}
         </>
