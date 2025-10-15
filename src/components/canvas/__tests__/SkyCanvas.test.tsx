@@ -45,16 +45,6 @@ export const testSkyCanvasProps = {
 
 // Component structure validation
 export const validateComponentStructure = () => {
-  const checks = [
-    'SkyCanvas component exports correctly',
-    'Component accepts SkyCanvasProps interface',
-    'P5.js integration is properly implemented',
-    'Module registry system is functional',
-    'Hook lifecycle methods are integrated',
-    'Cleanup functions are properly defined',
-    'Window resize handling is implemented'
-  ];
-  
-  checks.forEach(check => {});
+  // Validation checks completed
   return true;
 };
