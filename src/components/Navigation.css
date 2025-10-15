@@ -140,8 +140,10 @@
   }
   
   .nav-button > span {
-    grid-template-columns: 1fr calc(var(--font-size) * 1.75) !important;
+    grid-template-columns: 1fr !important;
     transition: none !important;
+    justify-content: center;
+    text-align: center;
   }
   
   .nav-button span span:nth-of-type(2) {

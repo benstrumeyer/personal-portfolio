@@ -308,6 +308,12 @@
   .submit-button {
     padding: 14px 24px;
     font-size: 1rem;
+    text-align: center;
+  }
+  
+  .submit-button span {
+    justify-content: center;
+    text-align: center;
   }
 }
 
@@ -345,5 +351,14 @@
   
   .contact-form {
     gap: 16px;
+  }
+  
+  .submit-button {
+    text-align: center;
+  }
+  
+  .submit-button span {
+    justify-content: center;
+    text-align: center;
   }
 }
