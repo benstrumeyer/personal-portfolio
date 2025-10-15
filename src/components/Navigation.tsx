@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EXTERNAL_URLS, SVG_NAMESPACE } from '../constants/urls';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import './Navigation.css';
