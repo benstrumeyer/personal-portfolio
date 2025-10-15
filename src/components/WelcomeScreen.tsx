@@ -105,7 +105,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onDismiss }) => {
   );
 
   const renderSentence2 = () => (
-    <div ref={sentence2Ref} className="welcome-sentence" style={{ marginBottom: '20px' }}>
+    <div ref={sentence2Ref} className="welcome-sentence" style={{ marginTop: '40px', marginBottom: '20px' }}>
       {sentence2.map((char, index) => (
         <span 
           key={index} 

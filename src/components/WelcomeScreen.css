@@ -86,6 +86,7 @@
   margin: 0;
   max-width: 90%;
   display: inline-block;
+  transform: translateY(-40px);
 }
 
 /* Welcome Paragraph */
