@@ -1,0 +1,266 @@
+/* Welcome Screen Styles */
+.welcome-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.8s ease-out;
+  cursor: pointer;
+}
+
+.welcome-screen.visible {
+  opacity: 1;
+}
+
+.welcome-screen.dismissed {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Welcome Content Container */
+.welcome-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Mobile Welcome Text */
+.welcome-text {
+  text-align: center;
+  margin: 0;
+  transition: all 0.8s ease-out;
+  position: relative;
+}
+
+.welcome-text.fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Creative Developer Text */
+.creative-developer-text {
+  text-align: center;
+  margin: 0;
+  transition: all 0.8s ease-out;
+  position: relative;
+}
+
+/* Desktop Welcome Text */
+.desktop-welcome {
+  text-align: center;
+  transition: all 0.8s ease-out;
+}
+
+.desktop-welcome.fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Welcome Text Content */
+.welcome-text-content {
+  font-weight: 500;
+  color: hsla(0 0% 100% / 0.9);
+  line-height: 1.4;
+  font-family: 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: 0.01em;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  white-space: pre-line;
+  text-align: center;
+  margin: 0;
+  max-width: 90%;
+  display: inline-block;
+}
+
+/* Individual letter animation */
+.letter {
+  opacity: 0;
+  transition: opacity 0.1s ease-in;
+}
+
+.letter.visible {
+  opacity: 1;
+}
+
+/* Mobile welcome text */
+.welcome-text .welcome-text-content {
+  font-size: 2.2rem;
+  font-weight: 600;
+}
+
+
+/* Header Container (Mobile) */
+.header-container {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.header-text {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: hsla(0 0% 100% / 0.9);
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Header Name (Mobile) - Legacy */
+.header-name {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: hsla(0 0% 100% / 0.9);
+  opacity: 0;
+  z-index: 1000;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.8s ease-out;
+}
+
+.header-name.slide-in {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Click Hint */
+.click-hint {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 1s forwards;
+}
+
+.click-hint p {
+  font-size: 1.6rem;
+  color: hsla(0 0% 100% / 0.8);
+  margin: 0;
+  font-style: italic;
+  font-family: 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 500;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .typing-text {
+    font-size: 2rem;
+    padding: 0 20px;
+    line-height: 1.4;
+  }
+  
+  .header-name {
+    font-size: 1.6rem;
+  }
+  
+  .click-hint p {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .typing-text {
+    font-size: 1.6rem;
+    padding: 0 15px;
+    line-height: 1.5;
+  }
+  
+  .header-name {
+    font-size: 1.4rem;
+  }
+  
+  .click-hint p {
+    font-size: 1.2rem;
+  }
+}
+
+/* Desktop Responsive */
+@media (min-width: 1024px) {
+  .typing-text {
+    font-size: 4rem;
+  }
+  
+  .welcome-text-content {
+    font-size: 3.5rem;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+  
+  .desktop-welcome {
+    max-width: 1400px;
+    padding: 0 40px;
+  }
+  
+  .click-hint p {
+    font-size: 2rem;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1440px) {
+  .typing-text {
+    font-size: 5rem;
+  }
+  
+  .welcome-text-content {
+    font-size: 4.5rem;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+  
+  .click-hint p {
+    font-size: 2.5rem;
+  }
+}

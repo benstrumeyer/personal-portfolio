@@ -16,6 +16,12 @@
   transition: opacity 0.8s ease-out;
 }
 
+.navigation.hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 .navigation.visible {
   opacity: 1;
 }
@@ -50,9 +56,7 @@
   position: relative;
   transition: border-color var(--transition);
   text-decoration: none;
-  opacity: 0;
-  transform: translateY(30px);
-  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 1;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
@@ -61,8 +65,9 @@
   padding: calc(var(--font-size) * 0.9) calc(var(--font-size) * 1.36);
   overflow: hidden;
   display: grid;
-  grid-template-columns: 1fr calc((var(--font-size) * 1.75) * var(--hovered, 0));
+  grid-template-columns: auto 1fr calc((var(--font-size) * 1.75) * var(--hovered, 0));
   align-items: center;
+  gap: calc(var(--font-size) * 0.5);
   transition: grid-template-columns var(--transition);
 }
 
@@ -81,9 +86,34 @@
   --hovered: 1;
 }
 
-.nav-button span span:nth-of-type(2) {
+.nav-button:hover .left-icon {
+  transform: translateX(calc(var(--font-size) * -0.3));
+}
+
+.nav-button:hover .button-text {
+  transform: translateX(calc(var(--font-size) * -0.2));
+}
+
+/* Left Icon Styles */
+.left-icon {
+  font-size: calc(var(--font-size) * 0.8);
+  transition: transform var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Button Text */
+.button-text {
+  transition: transform var(--transition);
+}
+
+/* Right Icon Styles */
+.right-icon {
   padding-left: var(--padding);
   width: var(--font-size);
+  opacity: var(--hovered, 0);
+  transition: opacity var(--transition);
 }
 
 .nav-button svg {
@@ -103,27 +133,48 @@
 }
 
 
-/* Fade in from bottom animation */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 /* Responsive design */
 @media (max-width: 768px) {
   .navigation {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    bottom: auto;
-    right: auto;
-    transform: translate(-50%, -50%);
+    top: -50px;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 60px;
+  }
+  
+  /* Header title */
+  .nav-header {
+    text-align: center;
+    order: 1;
+  }
+  
+  .nav-header .header-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: hsla(0 0% 100% / 0.9);
+    margin: 0;
+    letter-spacing: 0.02em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-family: 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.2;
+    display: inline-block;
+  }
+
+  /* Letter animation for header */
+  .nav-header .header-title .letter {
+    opacity: 0;
+    transition: opacity 0.1s ease-in;
+  }
+
+  .nav-header .header-title .letter.visible {
+    opacity: 1;
   }
   
   .nav-buttons {
@@ -133,6 +184,24 @@
     justify-content: center;
     width: 100%;
     max-width: 300px;
+    margin: 0 auto;
+    order: 2;
+  }
+  
+  /* Make buttons same width on mobile */
+  .nav-button {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navigation {
+    gap: 40px; /* Smaller gap for mobile */
+  }
+  
+  .nav-header .header-title {
+    font-size: 2rem;
   }
   
   .nav-button {
@@ -140,14 +209,28 @@
   }
   
   .nav-button > span {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: auto 1fr !important;
     transition: none !important;
     justify-content: center;
     text-align: center;
+    gap: calc(var(--font-size) * 0.3) !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
   }
   
-  .nav-button span span:nth-of-type(2) {
-    display: none;
+  .right-icon {
+    display: none !important;
+  }
+  
+  .left-icon {
+    font-size: calc(var(--font-size) * 0.7);
+  }
+  
+  /* Disable hover effects on mobile */
+  .nav-button:hover .left-icon,
+  .nav-button:hover .button-text {
+    transform: none !important;
   }
   
   :root {
@@ -164,5 +247,35 @@
   :root {
     --font-size: 1.3rem;
   }
+}
+
+/* Top-left name for desktop */
+.top-left-name {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+}
+
+.name-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: hsla(0 0% 100% / 0.9);
+  margin: 0;
+  letter-spacing: 0.02em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-family: 'Poppins', 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.2;
+  display: inline-block; /* For letter animation */
+}
+
+/* Letter animation for top-left name */
+.name-title .letter {
+  opacity: 0;
+  transition: opacity 0.1s ease-in;
+}
+
+.name-title .letter.visible {
+  opacity: 1;
 }
 
